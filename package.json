@@ -1,0 +1,10 @@
+{
+    "name": "husky-eats",
+    "private": true,
+    "packageManager": "pnpm@10.15.0",
+    "scripts": {
+        "dev:backend": "pnpm --filter ./apps/backend dev",
+        "dev:frontend": "pnpm --filter ./apps/frontend start"
+    },
+    "workspaces": ["apps/*"]
+}
