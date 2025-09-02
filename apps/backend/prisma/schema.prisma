@@ -25,13 +25,14 @@ model DiningHall {
 }
 
 model MenuItem {
+  id      Int
   name    String
   meal    String
   hallid  Int
   date    DateTime
   station String
 
-  @@id([name, meal, hallid, date])
+  @@id([id, name, meal, hallid, date])
 }
 
 model MenuItemInfo {
