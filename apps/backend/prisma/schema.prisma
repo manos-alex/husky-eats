@@ -10,3 +10,54 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model DiningHall {
+  id             Int     @id @default(autoincrement())
+  name           String
+  breakfaststart String
+  breakfastend   String
+  lunchstart     String
+  lunchend       String
+  dinnerstart    String
+  dinnerend      String
+  haslatenight   Boolean
+  hasgrabngo     Boolean
+}
+
+model MenuItem {
+  name    String
+  meal    String
+  hallid  Int
+  date    DateTime
+  station String
+
+  @@id([name, meal, hallid, date])
+}
+
+model MenuItemInfo {
+  name              String  @id
+  vegan             Boolean
+  vegetarian        Boolean
+  glutenfriendly    Boolean
+  smartcheck        Boolean
+  lesssodium        Boolean
+  nogarliconion     Boolean
+  containsnuts      Boolean
+  servingsize       String
+  calories          Int
+  totalfat          String?
+  saturatedfat      String?
+  transfat          String?
+  cholesterol       String?
+  sodium            String?
+  calcium           String?
+  iron              String?
+  totalcarbohydrate String?
+  dietaryfiber      String?
+  totalsugars       String?
+  addedsugars       String?
+  protein           String?
+  vitamind          String?
+  potassium         String?
+  allergens         String
+}

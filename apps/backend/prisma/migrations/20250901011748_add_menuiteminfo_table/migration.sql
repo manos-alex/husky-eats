@@ -1,0 +1,28 @@
+-- CreateTable
+CREATE TABLE "MenuItemInfo" (
+    "name" TEXT NOT NULL PRIMARY KEY,
+    "vegan" BOOLEAN NOT NULL,
+    "vegetarian" BOOLEAN NOT NULL,
+    "glutenfriendly" BOOLEAN NOT NULL,
+    "smartcheck" BOOLEAN NOT NULL,
+    "lesssodium" BOOLEAN NOT NULL,
+    "nogarliconion" BOOLEAN NOT NULL,
+    "containsnuts" BOOLEAN NOT NULL,
+    "servingsize" TEXT NOT NULL,
+    "calories" INTEGER NOT NULL,
+    "totalfat" TEXT,
+    "saturatedfat" TEXT,
+    "transfat" TEXT,
+    "cholesterol" TEXT,
+    "sodium" TEXT,
+    "calcium" TEXT,
+    "iron" TEXT,
+    "totalcarbohydrate" TEXT,
+    "dietaryfiber" TEXT,
+    "totalsugars" TEXT,
+    "addedsugars" TEXT,
+    "protein" TEXT,
+    "vitamind" TEXT,
+    "potassium" TEXT,
+    "allergens" TEXT NOT NULL
+);
