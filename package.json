@@ -3,8 +3,18 @@
     "private": true,
     "packageManager": "pnpm@10.15.0",
     "scripts": {
-        "dev:backend": "pnpm --filter ./apps/backend dev",
+        "start:backend": "concurrently \"pnpm dev:backend\" \"npx localtunnel --port 4000 --subdomain huskyeats\"",
+        "dev:backend": "npx tsx apps/backend/src/index.ts",
         "dev:frontend": "pnpm --filter ./apps/frontend start"
     },
-    "workspaces": ["apps/*"]
+    "workspaces": [
+        "apps/*"
+    ],
+    "devDependencies": {
+        "concurrently": "^9.2.1"
+    },
+    "dependencies": {
+        "react-native-safe-area-context": "^5.4.0",
+        "react-native-screens": "~4.11.1"
+    }
 }
