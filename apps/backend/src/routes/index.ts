@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.get("/", (_req, res) => res.json({ ok: true }));
 
-router.get("/ingest", ingest);
+router.use("/ingest", ingest);
 
 export default router;
