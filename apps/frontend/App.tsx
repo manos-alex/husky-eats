@@ -1,22 +1,31 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { useState, useEffect } from 'react';
-import { checkAPI } from './api';
+import { getDiningHalls, DiningHall } from './api';
 
 export default function App() {
-    const [status, setStatus] = useState("Not connected");
+    const [halls, setHalls] = useState<DiningHall[]>([]);
 
     useEffect(() => {
-        checkAPI()
-            .then((json) => {
-                if (json.ok) setStatus("Connected to API");
-            })
-            .catch((err) => setStatus(`Error: ${err.message}`))
+        async function load() {
+            try {
+                const halls = await getDiningHalls({});
+                setHalls(halls);
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        load();
     }, []);
 
     return ( 
         <View style={styles.container}>
-            <Text>{status}</Text>
+            {halls.map((hall, index) => (
+                <View>
+                    <Text style={{color: '#FFF'}} key={index}>{hall.name}</Text>
+                </View>
+            ))}
             <StatusBar style="auto" />
         </View>
     );
