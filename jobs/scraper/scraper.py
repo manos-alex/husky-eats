@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 from datetime import datetime
 
-def scrapeMenu(hall_id='05', date=datetime.today(), mealtime='Lunch'):
+def scrapeMenu(hall_id='01', date=datetime.today(), mealtime='Lunch'):
     html = requests.get(f"https://nutritionanalysis.dds.uconn.edu/longmenu.aspx?&locationNum={hall_id}&dtdate={date.strftime('%m%%2f%d%%2f%Y')}&mealName={mealtime}")
     soup = BeautifulSoup(html.text, "html.parser")
 
@@ -33,14 +33,11 @@ def scrapeMenu(hall_id='05', date=datetime.today(), mealtime='Lunch'):
 
     return data
 
-def push_menuitems():
+def push_menuitems(hall_id, mealtime):
     API_URL = "https://huskyeats.loca.lt/api/ingest/menuitems"
 
-    menuitems = scrapeMenu(hall_id='05', mealtime="Dinner")
+    menuitems = scrapeMenu(hall_id=hall_id, mealtime=mealtime)
     r = requests.post(API_URL, json=menuitems, timeout=10)
     r.raise_for_status()
 
     print("Response:", r.json())
-
-if __name__ == "__main__":
-    push_menuitems()
