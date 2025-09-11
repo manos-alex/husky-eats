@@ -2,11 +2,11 @@ import 'dotenv/config';
 import type { ExpoConfig } from '@expo/config';
 
 const config: ExpoConfig = {
-    name: "frontend",
+    name: "Husky Eats",
     slug: "frontend",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/icon.png",
+    icon: "./assets/bruger.png",
     userInterfaceStyle: "light",
     newArchEnabled: true,
     splash: {
@@ -25,7 +25,8 @@ const config: ExpoConfig = {
         edgeToEdgeEnabled: true
     },
     web: {
-        favicon: "./assets/favicon.png"
+        favicon: "./assets/favicon.png",
+        bundler: "metro",
     },
     extra: {
         API_BASEURL: process.env.API_BASEURL,

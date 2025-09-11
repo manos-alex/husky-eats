@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
+import "./global.css";
 import { useState, useEffect } from 'react';
 import { getDiningHalls, DiningHall } from './api';
 
@@ -20,22 +21,11 @@ export default function App() {
     }, []);
 
     return ( 
-        <View style={styles.container}>
-            {halls.map((hall, index) => (
-                <View>
-                    <Text style={{color: '#FFF'}} key={index}>{hall.name}</Text>
-                </View>
+        <View className="flex-1 bg-white items-center justify-center">
+            {halls.map((hall, index) => ( 
+                <Text className="font-bold text-blue-500" key={index}>{hall.name}</Text>
             ))}
             <StatusBar style="auto" />
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-});
