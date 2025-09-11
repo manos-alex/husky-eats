@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { Text, View } from 'react-native';
-import "../global.css";
+import "./global.css";
 import { useState, useEffect } from 'react';
 import { getDiningHalls, DiningHall } from './api';
 

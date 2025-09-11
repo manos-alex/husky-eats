@@ -6,11 +6,11 @@ const config: ExpoConfig = {
     slug: "frontend",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./src/assets/bruger.png",
+    icon: "./assets/bruger.png",
     userInterfaceStyle: "light",
     newArchEnabled: true,
     splash: {
-        image: "./src/assets/splash-icon.png",
+        image: "./assets/splash-icon.png",
         resizeMode: "contain",
         backgroundColor: "#ffffff"
     },
@@ -19,13 +19,13 @@ const config: ExpoConfig = {
     },
     android: {
         adaptiveIcon: {
-            foregroundImage: "./src/assets/adaptive-icon.png",
+            foregroundImage: "./assets/adaptive-icon.png",
             backgroundColor: "#ffffff"
         },
         edgeToEdgeEnabled: true
     },
     web: {
-        favicon: "./src/assets/favicon.png",
+        favicon: "./assets/favicon.png",
         bundler: "metro",
     },
     extra: {
