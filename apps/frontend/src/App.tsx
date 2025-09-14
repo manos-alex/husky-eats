@@ -3,6 +3,7 @@ import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./Screens/Home";
+import Hall from "./Screens/Hall";
 
 // Set default font
 (Text as any).defaultProps = {
@@ -23,6 +24,7 @@ export default function App() {
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Home">
                 <Stack.Screen name="Home" component={Home}/>
+                <Stack.Screen name="Hall" component={Hall}/>
             </Stack.Navigator>
         </NavigationContainer>
     );

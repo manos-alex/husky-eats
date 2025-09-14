@@ -13,6 +13,15 @@ export interface DiningHall {
     hasgrabngo: boolean,
 }
 
+export interface MenuItem {
+    id: number,
+    name: string,
+    meal: string,
+    hallid: number,
+    date: Date,
+    station: string,
+}
+
 const baseURL: string = 
         (Constants.expoConfig?.extra?.API_BASEURL as string) ||
         "http://172.27.30.61:4000";
@@ -29,5 +38,15 @@ export async function getDiningHalls({ id, name } : {id?: number, name?: string}
     if (name) params.append("name", name);
 
     const res = await fetch(`${baseURL}/api/ingest/dininghalls?${params.toString()}`);
+    return res.json();
+}
+
+export async function getMenuItems({ meal, hallid, date } : {meal?: string, hallid?: number, date?: Date}) {
+    const params = new URLSearchParams();
+    if (meal) params.append("meal", meal);
+    if (date) params.append("date", date.toISOString().split("T")[0]);
+    if (hallid) params.append("hallid", hallid.toString());
+
+    const res = await fetch(`${baseURL}/api/ingest/menuitems?${params.toString()}`)
     return res.json();
 }
