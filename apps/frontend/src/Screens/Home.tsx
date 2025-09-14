@@ -11,8 +11,8 @@ export default function Home({ navigation }: any) {
     useEffect(() => {
         async function load() {
             try {
-                const halls = await getDiningHalls({});
-                setHalls(halls);
+                const hallsRes = await getDiningHalls({});
+                setHalls(hallsRes);
             } catch (err) {
                 console.log(err);
             }
@@ -27,7 +27,7 @@ export default function Home({ navigation }: any) {
                 {halls.map((hall, index) => (
                     <Pressable className="border-[2px] border-[#1F1F1F] bg-[#141414] rounded-[30px] w-[95%] h-[120px] my-2 p-5 flex-row justify-between"
                         key={index}
-                        onPress={() => navigation.navigate("Hall", {hall})}>
+                        onPress={() => navigation.navigate("Hall", {route: hall})}>
                         <Text className="font-[400] text-[36px] text-[#DDD]" >{hall.name}</Text>
                         <Text className="text-[24px] text-[#DDD]" >{findMealtime(hall)}</Text>
                     </Pressable>
