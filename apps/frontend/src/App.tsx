@@ -4,28 +4,26 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./Screens/Home";
 import Hall from "./Screens/Hall";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-// Set default font
-(Text as any).defaultProps = {
-  ...(Text as any).defaultProps,
-  style: [{ fontFamily: "Roboto" }],
-};
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
     // Load font
     const [ready] = useFonts({
-        Roboto: require("./assets/fonts/Roboto-Regular.ttf"),
-        "Roboto-Bold": require("./assets/fonts/Roboto-Bold.ttf"),
+        Museo: require("./assets/fonts/MuseoSans-500.otf"),
+        Gotham: require("./assets/fonts/Gotham-Light.otf"),
     });
 
-    return ( 
-        <NavigationContainer>
-            <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Home">
-                <Stack.Screen name="Home" component={Home}/>
-                <Stack.Screen name="Hall" component={Hall}/>
-            </Stack.Navigator>
-        </NavigationContainer>
+    return (
+        <SafeAreaProvider>
+            <NavigationContainer>
+                <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Home">
+                    <Stack.Screen name="Home" component={Home}/>
+                    <Stack.Screen name="Hall" component={Hall}/>
+                </Stack.Navigator>
+            </NavigationContainer>
+        </SafeAreaProvider>
     );
 }

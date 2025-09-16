@@ -5,7 +5,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Roboto"], // default font
+        museo: ["Museo"],
+        gotham: ["Gotham"],
       },
     },
   },
