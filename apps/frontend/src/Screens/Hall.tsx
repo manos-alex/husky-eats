@@ -60,9 +60,9 @@ export default function Hall({route}: any) {
                         <View className="flex-1">
                         {[...new Set(displayItems.map(item => item.station))].map(station => (
                             <View key={station}>
-                                <Text className="font-gotham text-[32px] text-[#FFF] bg-[#2A2A2A] px-2 py-4 border-2">{station}</Text>
+                                <Text className="font-gotham text-[32px] text-[#FFF] bg-[#2A2A2A] px-2 py-4">{station}</Text>
                                 {displayItems.filter(item => item.station === station).map((menuItem, index) => (
-                                    <Text className="font-gotham text-[24px] text-[#DDD] px-2 py-6 border-t border-b" key={index}>{menuItem.name}</Text>
+                                    <Text className="font-gotham text-[24px] text-[#DDD] px-2 py-6 border-b" key={index}>{menuItem.name}</Text>
                                 ))}
                             </View>
                         ))}

@@ -37,15 +37,15 @@ model MenuItem {
 
 model MenuItemInfo {
   name              String  @id
-  vegan             Boolean
-  vegetarian        Boolean
-  glutenfriendly    Boolean
-  smartcheck        Boolean
-  lesssodium        Boolean
-  nogarliconion     Boolean
-  containsnuts      Boolean
-  servingsize       String
-  calories          Int
+  vegan             Boolean?
+  vegetarian        Boolean?
+  glutenfriendly    Boolean?
+  smartcheck        Boolean?
+  lesssodium        Boolean?
+  nogarliconion     Boolean?
+  containsnuts      Boolean?
+  servingsize       String?
+  calories          Int?
   totalfat          String?
   saturatedfat      String?
   transfat          String?
@@ -60,5 +60,5 @@ model MenuItemInfo {
   protein           String?
   vitamind          String?
   potassium         String?
-  allergens         String
+  allergens         String?
 }
