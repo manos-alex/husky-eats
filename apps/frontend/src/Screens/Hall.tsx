@@ -1,9 +1,8 @@
-import { StatusBar } from 'expo-status-bar';
-import { Text, View, ScrollView, Pressable } from 'react-native';
-import "../../global.css";
 import { useState, useEffect } from 'react';
-import { DiningHall, getMenuItems, MenuItem } from '../api';
+import { Text, View, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { getMenuItems, MenuItem } from '../api';
+import "../../global.css";
 
 export default function Hall({route}: any) {
     const [breakfastItems, setBreakfastItems] = useState<MenuItem[]>([]);

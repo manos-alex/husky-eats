@@ -1,9 +1,9 @@
-import { StatusBar } from 'expo-status-bar';
-import { Text, View, ScrollView, Pressable } from 'react-native';
-import "../../global.css";
 import { useState, useEffect } from 'react';
-import { getDiningHalls, DiningHall } from '../api';
+import { Text, View, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import { getDiningHalls, DiningHall } from '../api';
+import "../../global.css";
 
 export default function Home({ navigation }: any) {
     const [halls, setHalls] = useState<DiningHall[]>([]);

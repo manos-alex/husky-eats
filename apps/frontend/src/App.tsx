@@ -1,10 +1,10 @@
-import "../global.css";
-import { useFonts } from "expo-font";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./Screens/Home";
 import Hall from "./Screens/Hall";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { useFonts } from "expo-font";
+import "../global.css";
 
 
 const Stack = createNativeStackNavigator();
