@@ -98,7 +98,7 @@ router.get("/menuitems", async (req, res) => {
         console.error(err);
         res.status(500).json({ error: "Failed to fetch menuitems" });
     }
-})
+});
 
 // DINING HALLS
 
@@ -119,7 +119,7 @@ router.get("/dininghalls", async (req, res) => {
         console.error(err);
         res.status(500).json({ error: "Failed to fetch dininghalls" });
     }
-})
+});
 
 // NUTRITION FACTS
 
@@ -170,6 +170,25 @@ router.post("/nutrition", async (req, res) => {
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: "Ingest failed" });
+    }
+});
+
+router.get("/nutrition", async (req, res) => {
+    try {
+        const { name } = req.query;
+
+        const nutrition_facts = await prisma.menuItemInfo.findFirst({
+            where: {
+                ...(name ? {name : String(name)} : {}),
+            }
+        });
+
+        if (nutrition_facts === null) res.status(500).json({ error: "Item not found" })
+    
+        res.json(nutrition_facts);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to fetch nutrition facts" });
     }
 })
 

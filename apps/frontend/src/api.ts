@@ -22,6 +22,34 @@ export interface MenuItem {
     station: string,
 }
 
+export interface NutritionFacts {
+    name: string,
+    vegan: boolean | null,
+    vegetarian: boolean | null,
+    glutenfriendly: boolean | null,
+    smartcheck: boolean | null,
+    lesssodium: boolean | null,
+    nogarliconion: boolean | null,
+    containsnuts: boolean | null,
+    servingsize: string,
+    calories: number | null,
+    totalfat: string,
+    saturatedfat: string,
+    transfat: string,
+    cholesterol: string,
+    sodium: string,
+    calcium: string,
+    iron: string,
+    totalcarbohydrate: string,
+    dietaryfiber: string,
+    totalsugars: string,
+    addedsugars: string,
+    protein: string,
+    vitamind: string,
+    potassium: string,
+    allergens: string,
+}
+
 const baseURL: string = 
         (Constants.expoConfig?.extra?.API_BASEURL as string) ||
         "http://172.27.30.61:4000";
@@ -47,6 +75,14 @@ export async function getMenuItems({ meal, hallid, date } : {meal?: string, hall
     if (date) params.append("date", date.toISOString().split("T")[0]);
     if (hallid) params.append("hallid", hallid.toString());
 
-    const res = await fetch(`${baseURL}/api/ingest/menuitems?${params.toString()}`)
+    const res = await fetch(`${baseURL}/api/ingest/menuitems?${params.toString()}`);
+    return res.json();
+}
+
+export async function getNutritionFacts({ name } : {name?: string}) {
+    const params = new URLSearchParams();
+    if (name) params.append("name", name);
+
+    const res = await fetch(`${baseURL}/api/ingest/nutrition?${params.toString()}`);
     return res.json();
 }
