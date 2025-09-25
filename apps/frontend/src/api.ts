@@ -65,7 +65,7 @@ export async function getDiningHalls({ id, name } : {id?: number, name?: string}
     if (id) params.append("id", id.toString());
     if (name) params.append("name", name);
 
-    const res = await fetch(`${baseURL}/api/ingest/dininghalls?${params.toString()}`);
+    const res = await fetch(`${baseURL}/api/dininghall?${params.toString()}`);
     return res.json();
 }
 
@@ -75,7 +75,7 @@ export async function getMenuItems({ meal, hallid, date } : {meal?: string, hall
     if (date) params.append("date", date.toISOString().split("T")[0]);
     if (hallid) params.append("hallid", hallid.toString());
 
-    const res = await fetch(`${baseURL}/api/ingest/menuitems?${params.toString()}`);
+    const res = await fetch(`${baseURL}/api/menuitem?${params.toString()}`);
     return res.json();
 }
 
@@ -83,6 +83,6 @@ export async function getNutritionFacts({ name } : {name?: string}) {
     const params = new URLSearchParams();
     if (name) params.append("name", name);
 
-    const res = await fetch(`${baseURL}/api/ingest/nutrition?${params.toString()}`);
+    const res = await fetch(`${baseURL}/api/nutrition?${params.toString()}`);
     return res.json();
 }
