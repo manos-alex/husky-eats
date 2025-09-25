@@ -5,7 +5,7 @@
     "scripts": {
         "start:backend": "concurrently \"pnpm dev:backend\" \"pnpm dlx localtunnel --port 4000 --subdomain huskyeats\"",
         "start:dev": "concurrently --raw \"pnpm dev:frontend\" \"pnpm dev:backend\" \"pnpm dlx localtunnel --port 4000 --subdomain huskyeats\"",
-        "dev:backend": "pnpm dlx tsx apps/backend/src/index.ts",
+        "dev:backend": "pnpm dlx tsx apps/backend/src/server.ts",
         "dev:frontend": "pnpm --filter ./apps/frontend start"
     },
     "workspaces": [
