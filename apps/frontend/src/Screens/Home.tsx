@@ -29,7 +29,7 @@ export default function Home({ navigation }: any) {
                     {halls.map((hall, index) => (
                         <Pressable className="border-[2px] border-[#1F1F1F] bg-[#141414] rounded-[30px] w-[95%] h-[120px] my-2 p-5 flex-row justify-between"
                             key={index}
-                            onPress={() => navigation.navigate("Hall", {route: hall})}>
+                            onPress={() => navigation.navigate("Hall", {hall: hall})}>
                             <Text className="font-gotham text-[32px] text-[#DDD]" >{hall.name}</Text>
                             <Text className="font-gotham text-[24px] text-[#DDD]" >{findMealtime(hall)}</Text>
                         </Pressable>

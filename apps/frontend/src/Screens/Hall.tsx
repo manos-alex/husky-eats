@@ -2,7 +2,13 @@ import { useState, useEffect } from 'react';
 import { Text, View, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getMenuItems, MenuItem } from '../api';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import "../../global.css";
+
+type RootStackParamList = {
+  Nutrition: { name: string };
+};
 
 export default function Hall({route}: any) {
     const [breakfastItems, setBreakfastItems] = useState<MenuItem[]>([]);
@@ -12,7 +18,9 @@ export default function Hall({route}: any) {
 
     const [loading, setLoading] = useState(true);
 
-    const hall = route.params.route;
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+    const hall = route.params.hall;
 
     useEffect(() => {
         async function load() {
@@ -61,7 +69,11 @@ export default function Hall({route}: any) {
                             <View key={station}>
                                 <Text className="font-gotham text-[32px] text-[#FFF] bg-[#2A2A2A] px-2 py-4">{station}</Text>
                                 {displayItems.filter(item => item.station === station).map((menuItem, index) => (
-                                    <Text className="font-gotham text-[24px] text-[#DDD] px-2 py-6 border-b" key={index}>{menuItem.name}</Text>
+                                    <Pressable
+                                        key={index}
+                                        onPress={() => navigation.navigate("Nutrition", {name: menuItem.name})}>
+                                        <Text className="font-gotham text-[24px] text-[#DDD] px-2 py-6 border-b">{menuItem.name}</Text>
+                                    </Pressable>
                                 ))}
                             </View>
                         ))}
