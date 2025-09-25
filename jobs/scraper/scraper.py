@@ -145,8 +145,8 @@ def scrapeNutrition(to_scrape={}):
 def push_menuitems(hall_id, mealtime, date=datetime.today()):
     """Post menu items and nutrition facts to database"""
 
-    MENUITEM_API_URL = "https://huskyeats.loca.lt/api/ingest/menuitems"
-    NUTRITIONFACT_API_URL = "https://huskyeats.loca.lt/api/ingest/nutrition"
+    MENUITEM_API_URL = "https://huskyeats.loca.lt/api/menuitem"
+    NUTRITIONFACT_API_URL = "https://huskyeats.loca.lt/api/nutrition"
 
     menuitems, nutritionfacts = scrapeMenu(hall_id=hall_id, date=date, mealtime=mealtime)
     # Post menu items
