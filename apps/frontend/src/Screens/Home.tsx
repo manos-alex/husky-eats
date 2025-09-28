@@ -23,15 +23,18 @@ export default function Home({ navigation }: any) {
     }, []);
 
     return (
-        <SafeAreaView className="flex-1 bg-[#1A1A1A]">
-            <ScrollView className="flex-1 bg-[#1A1A1A]">
-                <View className="items-center my-20">
+        <SafeAreaView className="flex-1 bg-[#1e1e1e]">
+            <View className="p-4">
+                <Text className="font-gotham text-[#DDD] text-[48px] text-center">HuskyEats</Text>
+            </View>
+            <ScrollView className="flex-1 bg-[#252525]">
+                <View className="items-center my-6">
                     {halls.map((hall, index) => (
-                        <Pressable className="border-[2px] border-[#1F1F1F] bg-[#141414] rounded-[30px] w-[95%] h-[120px] my-2 p-5 flex-row justify-between"
+                        <Pressable className="border-[2px] border-[#1F1F1F] bg-[#1a1a1a] rounded-[30px] w-[95%] h-[120px] my-2 p-5 flex-row justify-between"
                             key={index}
-                            onPress={() => navigation.navigate("Hall", {hall: hall})}>
-                            <Text className="font-gotham text-[32px] text-[#DDD]" >{hall.name}</Text>
-                            <Text className="font-gotham text-[24px] text-[#DDD]" >{findMealtime(hall)}</Text>
+                            onPress={() => navigation.navigate("Hall", {hall: hall, meal: findMealtime(hall)})}>
+                            <Text className="font-museo text-[32px] text-[#DDD]" >{hall.name}</Text>
+                            <Text className="font-museo text-[24px] text-[#DDD]" >{findMealtime(hall)}</Text>
                         </Pressable>
                     ))}
                     <StatusBar style="auto" />

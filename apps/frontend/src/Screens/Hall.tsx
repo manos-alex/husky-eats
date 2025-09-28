@@ -7,26 +7,30 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import "../../global.css";
 
 type RootStackParamList = {
-  Nutrition: { name: string };
+    Nutrition: { name: string };
 };
 
 export default function Hall({route}: any) {
+    const { hall, meal } = route.params;
+
     const [breakfastItems, setBreakfastItems] = useState<MenuItem[]>([]);
     const [lunchItems, setLunchItems] = useState<MenuItem[]>([]);
     const [dinnerItems, setDinnerItems] = useState<MenuItem[]>([]);
     const [displayItems, setDisplayItems] = useState<MenuItem[]>([]);
 
+    const [curMeal, setCurMeal] = useState("Breakfast");
+    if (meal !== "Closed") setCurMeal(meal)
+
     const [loading, setLoading] = useState(true);
 
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-    const hall = route.params.hall;
 
     useEffect(() => {
         async function load() {
             try {
                 setLoading(true);
-                const d = new Date(2025, 8, 15);
+                const d = new Date(2025, 8, 25);
                 const breakfastItemsRes = await getMenuItems({hallid: hall.id, date: d, meal: "Breakfast"});
                 const lunchItemsRes = await getMenuItems({hallid: hall.id, date: d, meal: "Lunch"});
                 const dinnerItemsRes = await getMenuItems({hallid: hall.id, date: d, meal: "Dinner"});
@@ -46,33 +50,48 @@ export default function Hall({route}: any) {
     }, [])
 
     const changeMeal = (meal: String) => {
-        if (meal === "Breakfast") setDisplayItems(breakfastItems);
-        if (meal === "Lunch") setDisplayItems(lunchItems);
-        if (meal === "Dinner") setDisplayItems(dinnerItems);
+        if (meal === "Breakfast") {
+            setDisplayItems(breakfastItems);
+            setCurMeal("Breakfast");    
+        }
+        if (meal === "Lunch") {
+            setDisplayItems(lunchItems);
+            setCurMeal("Lunch");
+        }
+        if (meal === "Dinner") {
+            setDisplayItems(dinnerItems);
+            setCurMeal("Dinner");
+        }
     }
 
     return (
-        <SafeAreaView className="flex-1 bg-[#1A1A1A]">
+        <SafeAreaView className="flex-1 bg-[#1e1e1e]">
             <View className="items-center">
-                <Text className="font-gotham text-[36px] text-[#DDD]" >{hall.name}</Text>
-                <View className="flex-row justify-evenly" >
-                    <Pressable className="border-4 p-4" onPress={() => changeMeal("Breakfast")} ><Text className="text-[#DDD]" >Breakfast</Text></Pressable>
-                    <Pressable className="border-4 p-4" onPress={() => changeMeal("Lunch")} ><Text className="text-[#DDD]" >Lunch</Text></Pressable>
-                    <Pressable className="border-4 p-4" onPress={() => changeMeal("Dinner")}><Text className="text-[#DDD]" >Dinner</Text></Pressable>
+                <Text className="font-museo mt-2 text-[36px] text-[#DDD]" >{hall.name}</Text>
+                <View className="flex-row items-center mt-2" >
+                    <Pressable className={`px-4 py-2 flex-1 ${curMeal === "Breakfast" ? "border-b-4 border-blue-900" : ""}`} onPress={() => changeMeal("Breakfast")} >
+                        <Text className="font-museo text-[#DDD] text-center text-[24px]" >Breakfast</Text>
+                    </Pressable>
+                    <Pressable className={`px-4 py-2 flex-1 ${curMeal === "Lunch" ? "border-b-4 border-blue-900" : ""}`} onPress={() => changeMeal("Lunch")} >
+                        <Text className="font-museo text-[#DDD] text-center text-[24px]" >Lunch</Text>
+                    </Pressable>
+                    <Pressable className={`px-4 py-2 flex-1 ${curMeal === "Dinner" ? "border-b-4 border-blue-900" : ""}`} onPress={() => changeMeal("Dinner")}>
+                        <Text className="font-museo text-[#DDD] text-center text-[24px]" >Dinner</Text>
+                    </Pressable>
                 </View>
             </View>
-            <ScrollView className="flex-1 bg-[#1A1A1A]">
-                <View className="flex-1 mt-4 justify-center">
+            <ScrollView className="flex-1 bg-[#252525]">
+                <View className="flex-1 justify-center">
                     {!loading ?
                         <View className="flex-1">
                         {[...new Set(displayItems.map(item => item.station))].map(station => (
                             <View key={station}>
-                                <Text className="font-gotham text-[32px] text-[#FFF] bg-[#2A2A2A] px-2 py-4">{station}</Text>
+                                <Text className="font-museo text-[32px] text-[#FFF] bg-[#1e1e1e] px-8 py-4">{station}</Text>
                                 {displayItems.filter(item => item.station === station).map((menuItem, index) => (
                                     <Pressable
                                         key={index}
                                         onPress={() => navigation.navigate("Nutrition", {name: menuItem.name})}>
-                                        <Text className="font-gotham text-[24px] text-[#DDD] px-2 py-6 border-b">{menuItem.name}</Text>
+                                        <Text className="font-gotham text-[24px] text-[#DDD] px-8 py-6">{menuItem.name}</Text>
                                     </Pressable>
                                 ))}
                             </View>
