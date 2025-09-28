@@ -14,12 +14,14 @@ datasource db {
 model DiningHall {
   id             Int     @id @default(autoincrement())
   name           String
-  breakfaststart String
-  breakfastend   String
-  lunchstart     String
-  lunchend       String
-  dinnerstart    String
-  dinnerend      String
+  wdbreakfast    String?
+  wdlunch        String?
+  wddinner       String?
+  wesatbreakfast String?
+  wesunbreakfast String?
+  webrunch       String?
+  wedinner       String?
+  latenight      String?
   haslatenight   Boolean
   hasgrabngo     Boolean
 }
@@ -36,7 +38,7 @@ model MenuItem {
 }
 
 model MenuItemInfo {
-  name              String  @id
+  name              String   @id
   vegan             Boolean?
   vegetarian        Boolean?
   glutenfriendly    Boolean?
