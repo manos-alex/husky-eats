@@ -30,11 +30,14 @@ export default function Home({ navigation }: any) {
             <ScrollView className="flex-1 bg-[#252525]">
                 <View className="items-center my-6">
                     {halls.map((hall, index) => (
-                        <Pressable className="border-[2px] border-[#1F1F1F] bg-[#1a1a1a] rounded-[30px] w-[95%] h-[120px] my-2 p-5 flex-row justify-between"
+                        <Pressable className="border-[2px] border-[#1F1F1F] bg-[#1a1a1a] rounded-[30px] w-[95%] h-[120px] my-2 p-5 flex-col justify-between"
                             key={index}
-                            onPress={() => navigation.navigate("Hall", {hall: hall, meal: findMealtime(hall)})}>
-                            <Text className="font-museo text-[32px] text-[#DDD]" >{hall.name}</Text>
-                            <Text className="font-museo text-[24px] text-[#DDD]" >{findMealtime(hall)}</Text>
+                            onPress={() => navigation.navigate("Hall", {hall: hall, meal: findMealtime(hall)[0]})}>
+                            <View className='flex-row justify-between'>
+                                <Text className="font-museo text-[32px] text-[#DDD]" >{hall.name}</Text>
+                                <Text className="font-museo text-[24px] text-[#DDD]" >{findMealtime(hall)[0]}</Text>
+                            </View>
+                            <Text className="font-museo text-[20px] text-[#DDD] text-right" >{findMealtime(hall)[1]}</Text>
                         </Pressable>
                     ))}
                     <StatusBar style="auto" />
@@ -51,18 +54,31 @@ export function stringToDate(time: string) {
     return date;
 }
 
-export function findMealtime(hall: DiningHall) {
-    const breakfaststart = stringToDate(hall.breakfaststart);
-    const breakfastend = stringToDate(hall.breakfastend);
-    const lunchstart = stringToDate(hall.lunchstart);
-    const lunchend = stringToDate(hall.lunchend);
-    const dinnerstart = stringToDate(hall.dinnerstart);
-    const dinnerend = stringToDate(hall.dinnerend);
+export function inInterval(time: string | null) {
+    if (time === null) return [false, ""];
 
+    const interval = time.split("-");
+    const start = stringToDate(interval[0]);
+    const end = stringToDate(interval[1]);
     const now = new Date();
 
-    if (breakfaststart <= now && now < breakfastend) return "Breakfast";
-    if (lunchstart <= now && now < lunchend) return "Lunch";
-    if (dinnerstart <= now && now < dinnerend) return "Dinner";
-    return "Closed";
+    if (start <= now && now <= end) return [true, end.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true })];
+    return [false, ""];
+}
+
+export function findMealtime(hall: DiningHall) {
+    const day = new Date().getDay()
+
+    if (day === 0 || day === 6) {
+        if (day === 6) if (inInterval(hall.wesatbreakfast)[0]) return ["Breakfast", `Until ${inInterval(hall.wesatbreakfast)[1]}`];
+        if (day === 0) if (inInterval(hall.wesunbreakfast)[0]) return ["Breakfast", `Until ${inInterval(hall.wesunbreakfast)[1]}`];
+        if (inInterval(hall.webrunch)[0]) return ["Brunch", `Until ${inInterval(hall.webrunch)[1]}`];
+        if (inInterval(hall.wedinner)[0]) return ["Dinner", `Until ${inInterval(hall.wedinner)[1]}`];
+    } else {
+        if (inInterval(hall.wdbreakfast)[0]) return ["Breakfast", `Until ${inInterval(hall.wdbreakfast)[1]}`];
+        if (inInterval(hall.wdlunch)[0]) return ["Lunch", `Until ${inInterval(hall.wdlunch)[1]}`];
+        if (inInterval(hall.wddinner)[0]) return ["Dinner", `Until ${inInterval(hall.wddinner)[1]}`];
+    }
+
+    return ["Closed", ""];
 }
