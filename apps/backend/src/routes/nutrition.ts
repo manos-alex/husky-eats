@@ -1,5 +1,6 @@
 import express from "express";
-import { prisma } from "../prisma";
+import { prisma } from "../prisma.js";
+import { requireApiKey } from "../middleware.js";
 
 const router = express.Router();
 
@@ -31,7 +32,7 @@ interface NutritionFacts {
     allergens: string,
 }
 
-router.post("/nutrition", async (req, res) => {
+router.post("/nutrition", requireApiKey, async (req, res) => {
     try {
         const nutrition_facts = req.body;
 

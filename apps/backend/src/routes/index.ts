@@ -1,7 +1,7 @@
 import express from "express";
-import dininghall from "./dininghall";
-import menuitem from "./menuitem";
-import nutrition from "./nutrition";
+import dininghall from "./dininghall.js";
+import menuitem from "./menuitem.js";
+import nutrition from "./nutrition.js";
 
 const router = express.Router();
 

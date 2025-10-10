@@ -1,7 +1,11 @@
 from bs4 import BeautifulSoup
 import requests
 import re
+import os
+from dotenv import load_dotenv
 from datetime import datetime
+
+load_dotenv()   # Read .env in the current directory
 
 ### MENU ITEMS ###
 def scrapeMenu(hall_id='01', date=datetime.today(), mealtime='Lunch'):
@@ -140,20 +144,22 @@ def scrapeNutrition(to_scrape={}):
 
     return data
         
-        
-        
 def push_menuitems(hall_id, mealtime, date=datetime.today()):
     """Post menu items and nutrition facts to database"""
+
+    API_KEY = os.getenv("API_KEY")
 
     MENUITEM_API_URL = "https://huskyeats.loca.lt/api/menuitem"
     NUTRITIONFACT_API_URL = "https://huskyeats.loca.lt/api/nutrition"
 
+    headers = {"x-api-key": API_KEY}
+
     menuitems, nutritionfacts = scrapeMenu(hall_id=hall_id, date=date, mealtime=mealtime)
     # Post menu items
-    r = requests.post(MENUITEM_API_URL, json=menuitems)
+    r = requests.post(MENUITEM_API_URL, headers=headers, json=menuitems)
     r.raise_for_status()
     # Post nutrition facts
-    r = requests.post(NUTRITIONFACT_API_URL, json=nutritionfacts)
+    r = requests.post(NUTRITIONFACT_API_URL, headers=headers, json=nutritionfacts)
     r.raise_for_status()
 
     print("Response:", r.json(), "for", hall_id, mealtime)

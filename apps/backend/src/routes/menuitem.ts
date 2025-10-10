@@ -1,5 +1,6 @@
 import express from "express";
-import { prisma } from "../prisma";
+import { prisma } from "../prisma.js";
+import { requireApiKey } from "../middleware.js";
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ interface MenuItem {
     station: string,
 }
 
-router.post("/menuitem", async (req, res) => {
+router.post("/menuitem", requireApiKey, async (req, res) => {
     try {
         const menuitems = req.body;
         
