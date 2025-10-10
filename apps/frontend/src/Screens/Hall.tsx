@@ -18,8 +18,7 @@ export default function Hall({route}: any) {
     const [dinnerItems, setDinnerItems] = useState<MenuItem[]>([]);
     const [displayItems, setDisplayItems] = useState<MenuItem[]>([]);
 
-    const [curMeal, setCurMeal] = useState("Breakfast");
-    if (meal !== "Closed") setCurMeal(meal)
+    const [curMeal, setCurMeal] = useState(() => (meal !== "Closed" ? meal : "Breakfast"));
 
     const [loading, setLoading] = useState(true);
 
