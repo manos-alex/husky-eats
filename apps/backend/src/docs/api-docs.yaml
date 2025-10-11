@@ -1,0 +1,229 @@
+openapi: 3.1.0
+info:
+    title: HuskyEats API
+    version: 1.0.0
+    description: UConn dining hall menu items and nutrition information
+servers:
+    - url: https://husky-eats.onrender.com/api
+components:
+    securitySchemes:
+        ApiKeyAuth:
+            type: apiKey
+            in: header
+            name: x-api-key
+    schemas:
+        DiningHall:
+            type: object
+            properties:
+                id: { type: integer }
+                name: { type: string }
+                wdbreakfast: { type: string }
+                wdlunch: { type: string }
+                wddinner: { type: string }
+                wesatbreakfast: { type: string }
+                wesunbreakfast: { type: string }
+                webrunch: { type: string }
+                wedinner: { type: string }
+                latenight: { type: string }
+                haslatenight: { type: boolean }
+                hasgrabngo: { type: boolean }
+        MenuItem:
+            type: object
+            properties:
+                id: { type: integer }
+                name: { type: string }
+                meal: { type: string }
+                hallid: { type: integer }
+                date: { type: string, format: date }
+                station: { type: string }
+        NutritionFacts:
+            type: object
+            properties:
+                name: { type: string }
+                vegan: { type: boolean }
+                vegetarian: { type: boolean }
+                glutenfriendly: { type: boolean }
+                smartcheck: { type: boolean }
+                lesssodium: { type: boolean }
+                nogarliconion: { type: boolean }
+                containsnuts: { type: boolean }
+                servingsize: { type: string }
+                calories: { type: integer }
+                totalfat: { type: string }
+                saturatedfat: { type: string }
+                transfat: { type: string }
+                cholesterol: { type: string }
+                sodium: { type: string }
+                calcium: { type: string }
+                iron: { type: string }
+                totalcarbohydrate: { type: string }
+                dietaryfiber: { type: string }
+                totalsugars: { type: string }
+                addedsugars: { type: string }
+                protein: { type: string }
+                vitamind: { type: string }
+                potassium: { type: string }
+                allergens: { type: string }
+        ErrorResponse:
+            type: object
+            properties:
+                error: { type: string }
+tags:
+    - name: dininghall
+      description: List dining halls
+    - name: menuitem
+      description: Find or upsert menu items
+    - name: nutrition
+      description: Find or upsert nutrition facts
+paths:
+    /:
+        get:
+            summary: Health check
+            responses:
+                200:
+                    description: API is running and reachable
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    ok: { type: boolean }
+    /dininghall:
+        get:
+            tags:
+                - dininghall
+            summary: List dining halls
+            parameters:
+                - in: query
+                  name: id
+                  schema: { type: integer }
+                - in: query
+                  name: name
+                  schema: { type: string }
+            responses:
+                200:
+                    description: Matching dining halls
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/DiningHall'
+                500:
+                    description: Failure to retrieve dining halls
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+    /menuitem:
+        get:
+            tags:
+                - menuitem
+            summary: List menu items
+            parameters:
+                - in: query
+                  name: hallid
+                  schema: { type: integer }
+                - in: query
+                  name: meal
+                  schema: { type: string }
+                - in: query
+                  name: date
+                  schema: { type: string, format: date }
+                  description: YYYY-MM-DD
+            responses:
+                200:
+                    description: Matching menu items
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/MenuItem'
+                500:
+                    description: Failed to retrieve menu items
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+        post:
+            tags:
+                - menuitem
+            summary: Upsert menu items to database
+            security:
+                - ApiKeyAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: array
+                            items:
+                                $ref: '#/components/schemas/MenuItem'
+            responses:
+                200:
+                    description: Upsert successful
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    ok: { type: boolean }
+                500:
+                    description: Ingest error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+    /nutrition:
+        get:
+            tags:
+                - nutrition
+            summary: Fetch nutrition facts
+            parameters:
+                - in: query
+                  name: name
+                  required: false
+                  schema: { type: string }
+            responses:
+                200:
+                    description: Matching nutrition facts
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/NutritionFacts'
+                500:
+                    description: Failed to retireve nutrition facts
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+        post:
+            tags:
+                - nutrition
+            summary: Upsert nutrition facts to database
+            security:
+                - ApiKeyAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: array
+                            items:
+                                $ref: '#/components/schemas/NutritionFacts'
+            responses:
+                200:
+                    description: Upsert successful
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    ok: { type: boolean }
+                500:
+                    description: Ingest error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
