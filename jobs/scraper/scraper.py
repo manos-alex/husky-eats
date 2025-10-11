@@ -43,7 +43,7 @@ def scrapeMenu(hall_id='01', date=datetime.today(), mealtime='Lunch'):
             menuitem_data.append({
                 "id": item_ids[item],
                 "name": item,
-                "meal": mealtime,
+                "meal": mealtime.lower(),
                 "hallid": int(hall_id),
                 "date": date.strftime("%Y-%m-%d"),
                 "station": station
@@ -67,7 +67,7 @@ def scrapeNutrition(to_scrape={}):
 
         # Initialize nutrition facts
         nutrition_facts = {
-            "name": soup.find(class_="labelrecipe").get_text(),
+            "name": soup.find(class_="labelrecipe").get_text().lower(),
             "vegan": None,
             "vegetarian": None,
             "glutenfriendly": None,

@@ -1,6 +1,7 @@
 import express from "express";
 import { prisma } from "../prisma.js";
 import { requireApiKey } from "../middleware.js";
+import { toLowerCase } from "zod";
 
 const router = express.Router();
 
@@ -59,7 +60,7 @@ router.get("/menuitem", async (req, res) => {
             where: {
                 ...(hallid ? {hallid : Number(hallid)} : {}),
                 ...(date ? {date : new Date(String(date))} : {}),
-                ...(meal ? {meal : String(meal)} : {}),
+                ...(meal ? {meal : String(meal).toLowerCase()} : {}),
             },
             orderBy: { station: "desc" },
         });

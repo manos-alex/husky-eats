@@ -88,7 +88,7 @@ router.get("/nutrition", async (req, res) => {
 
         const nutrition_facts = await prisma.menuItemInfo.findFirst({
             where: {
-                ...(name ? {name : String(name)} : {}),
+                ...(name ? {name : String(name).toLowerCase()} : {}),
             }
         });
 
