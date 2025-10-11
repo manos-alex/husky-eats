@@ -149,8 +149,8 @@ def push_menuitems(hall_id, mealtime, date=datetime.today()):
 
     API_KEY = os.getenv("API_KEY")
 
-    MENUITEM_API_URL = "https://huskyeats.loca.lt/api/menuitem"
-    NUTRITIONFACT_API_URL = "https://huskyeats.loca.lt/api/nutrition"
+    MENUITEM_API_URL = os.getenv("MENUITEM_API_URL")
+    NUTRITIONFACT_API_URL = os.getenv("NUTRITIONFACT_API_URL")
 
     headers = {"x-api-key": API_KEY}
 

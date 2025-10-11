@@ -2,7 +2,7 @@ import requests
 from scraper import push_menuitems
 
 if __name__ == "__main__":
-    res = requests.get("https://huskyeats.loca.lt/api/dininghall?")
+    res = requests.get("https://husky-eats.onrender.com/api/dininghall?")
     hall_data = res.json()
 
     halls = [f"{hall['id']:02}" for hall in hall_data]
