@@ -5,13 +5,7 @@ const router = express.Router();
 
 router.get("/dininghall", async (req, res) => {
     try {
-        const { id, name } = req.query;
-
         const dininghalls = await prisma.diningHall.findMany({
-            where: {
-                ...(id ? {id : Number(id)} : {}),
-                ...(name ? {name : String(name)} : {}),
-            },
             orderBy: { name: "asc" },
         });
 
@@ -19,6 +13,29 @@ router.get("/dininghall", async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Failed to fetch dininghalls" });
+    }
+});
+
+router.get("/dininghall/:id", async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+
+        if (Number.isNaN(id)) {
+            return res.status(400).json({ error: "Invalid dining hall id" });
+        }
+
+        const dininghall = await prisma.diningHall.findUnique({
+            where: { id },
+        });
+
+        if (!dininghall) {
+            return res.status(404).json({ error: "Dining hall not found" });
+        }
+
+        res.json(dininghall);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to fetch dining hall" });
     }
 });
 

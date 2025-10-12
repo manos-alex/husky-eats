@@ -5,6 +5,7 @@ info:
     description: UConn dining hall menu items and nutrition information
 servers:
     - url: https://husky-eats.onrender.com/api
+    - url: http://localhost:4000/api
 components:
     securitySchemes:
         ApiKeyAuth:
@@ -49,20 +50,20 @@ components:
                 containsnuts: { type: boolean }
                 servingsize: { type: string }
                 calories: { type: integer }
-                totalfat: { type: string }
-                saturatedfat: { type: string }
-                transfat: { type: string }
-                cholesterol: { type: string }
-                sodium: { type: string }
-                calcium: { type: string }
-                iron: { type: string }
-                totalcarbohydrate: { type: string }
-                dietaryfiber: { type: string }
-                totalsugars: { type: string }
-                addedsugars: { type: string }
-                protein: { type: string }
-                vitamind: { type: string }
-                potassium: { type: string }
+                totalfat_g: { type: float }
+                saturatedfat_g: { type: float }
+                transfat_g: { type: float }
+                cholesterol_mg: { type: float }
+                sodium_mg: { type: float }
+                calcium_mg: { type: float }
+                iron_mg: { type: float }
+                totalcarbohydrate_g: { type: float }
+                dietaryfiber_g: { type: float }
+                totalsugars_g: { type: float }
+                addedsugars_g: { type: float }
+                protein_g: { type: float }
+                vitamind_mcg: { type: float }
+                potassium_mg: { type: float }
                 allergens: { type: string }
         ErrorResponse:
             type: object
@@ -71,10 +72,12 @@ components:
 tags:
     - name: dininghall
       description: List dining halls
+    - name: menu
+      description: Find menus
     - name: menuitem
-      description: Find or upsert menu items
+      description: List menu items or find nutrition facts, upsert new menu items
     - name: nutrition
-      description: Find or upsert nutrition facts
+      description: Upsert nutrition facts
 paths:
     /:
         get:
@@ -93,16 +96,9 @@ paths:
             tags:
                 - dininghall
             summary: List dining halls
-            parameters:
-                - in: query
-                  name: id
-                  schema: { type: integer }
-                - in: query
-                  name: name
-                  schema: { type: string }
             responses:
                 200:
-                    description: Matching dining halls
+                    description: All dining halls
                     content:
                         application/json:
                             schema:
@@ -115,25 +111,53 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ErrorResponse'
-    /menuitem:
+    /dininghall/{id}:
         get:
             tags:
-                - menuitem
-            summary: List menu items
+                - dininghall
+            summary: Find matching dininghall
+            parameters:
+                - name: id
+                  in: path
+                  description: ID of dininghall to return
+                  required: true
+                  schema:
+                    type: integer
+                    format: int64
+            responses:
+                200:
+                    description: Matching dining hall
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DiningHall'
+                500:
+                    description: Failure to retrieve dining hall
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+    /menu:
+        get:
+            tags:
+                - menu
+            summary: List items on the menu
             parameters:
                 - in: query
                   name: hallid
                   schema: { type: integer }
+                  description: autofills with 1
                 - in: query
                   name: meal
                   schema: { type: string }
+                  description: autofills with 'lunch'
                 - in: query
                   name: date
                   schema: { type: string, format: date }
-                  description: YYYY-MM-DD
+                  description: autofills with today's date, YYYY-MM-DD
             responses:
                 200:
-                    description: Matching menu items
+                    description: Matching menu's items
                     content:
                         application/json:
                             schema:
@@ -146,6 +170,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ErrorResponse'
+    /menuitem:
         post:
             tags:
                 - menuitem
@@ -175,16 +200,37 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ErrorResponse'
-    /nutrition:
         get:
             tags:
-                - nutrition
-            summary: Fetch nutrition facts
+                - menuitem
+            summary: List all menu items
+            responses:
+                200:
+                    description: All menu items
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/MenuItem'
+                500:
+                    description: Failed to retrieve menu items
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+    /menuitem/{id}:
+        get:
+            tags:
+                - menuitem
+            summary: Fetch an item's nutrition facts
             parameters:
-                - in: query
-                  name: name
-                  required: false
-                  schema: { type: string }
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: integer
+                    format: int64
             responses:
                 200:
                     description: Matching nutrition facts
@@ -198,6 +244,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ErrorResponse'
+    /nutrition:
         post:
             tags:
                 - nutrition

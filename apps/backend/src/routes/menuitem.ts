@@ -54,14 +54,7 @@ router.post("/menuitem", requireApiKey, async (req, res) => {
 
 router.get("/menuitem", async (req, res) => {
     try {
-        const { hallid, date, meal } = req.query;
-
         const menuitems = await prisma.menuItem.findMany({
-            where: {
-                ...(hallid ? {hallid : Number(hallid)} : {}),
-                ...(date ? {date : new Date(String(date))} : {}),
-                ...(meal ? {meal : String(meal).toLowerCase()} : {}),
-            },
             orderBy: { station: "desc" },
         });
 
@@ -71,5 +64,25 @@ router.get("/menuitem", async (req, res) => {
         res.status(500).json({ error: "Failed to fetch menuitems" });
     }
 });
+
+router.get("/menu", async (req, res) => {
+    try {
+        const { hallid, date, meal } = req.query;
+
+        const menu = await prisma.menuItem.findMany({
+            where: {
+                ...(hallid ? {hallid : Number(hallid)} : {hallid: 1}),
+                ...(date ? {date : new Date(String(date))} : {date : new Date()}),
+                ...(meal ? {meal : String(meal).toLowerCase()} : {meal: "lunch"}),
+            },
+            orderBy: { station: "desc" },
+        });
+
+        res.json(menu);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to fetch menu" });
+    }
+})
 
 export default router;

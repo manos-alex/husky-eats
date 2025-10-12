@@ -84,18 +84,19 @@ router.post("/nutrition", requireApiKey, async (req, res) => {
     }
 });
 
-router.get("/nutrition", async (req, res) => {
+router.get("/menuitem/:id", async (req, res) => {
     try {
-        const { id, name } = req.query;
+        const id = Number(req.params.id);
+
+        if (Number.isNaN(id)) {
+            return res.status(400).json({ error: "Invalid menu item id" });
+        }
 
         const nutrition_facts = await prisma.menuItemInfo.findFirst({
-            where: {
-                ...(id ? {id : Number(id)} : {}),
-                ...(name ? {name : String(name).toLowerCase()} : {}),
-            }
+            where: { id }
         });
 
-        if (nutrition_facts === null) res.status(500).json({ error: "Item not found" })
+        if (!nutrition_facts) res.status(404).json({ error: "Item not found" })
     
         res.json(nutrition_facts);
     } catch (err) {

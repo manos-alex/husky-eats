@@ -37,30 +37,30 @@ model MenuItem {
 }
 
 model MenuItemInfo {
-  id                Int @id
-  name              String
-  vegan             Boolean?
-  vegetarian        Boolean?
-  glutenfriendly    Boolean?
-  smartcheck        Boolean?
-  lesssodium        Boolean?
-  nogarliconion     Boolean?
-  containsnuts      Boolean?
-  servingsize       String?
-  calories          Int?
+  id                  Int      @id
+  name                String
+  vegan               Boolean?
+  vegetarian          Boolean?
+  glutenfriendly      Boolean?
+  smartcheck          Boolean?
+  lesssodium          Boolean?
+  nogarliconion       Boolean?
+  containsnuts        Boolean?
+  servingsize         String?
+  calories            Int?
   totalfat_g          Float?
   saturatedfat_g      Float?
   transfat_g          Float?
-  cholesterol_mg       Float?
-  sodium_mg            Float?
-  calcium_mg           Float?
-  iron_mg              Float?
+  cholesterol_mg      Float?
+  sodium_mg           Float?
+  calcium_mg          Float?
+  iron_mg             Float?
   totalcarbohydrate_g Float?
   dietaryfiber_g      Float?
   totalsugars_g       Float?
   addedsugars_g       Float?
   protein_g           Float?
-  vitamind_mcg          Float?
-  potassium_mg         Float?
-  allergens         String?
+  vitamind_mcg        Float?
+  potassium_mg        Float?
+  allergens           String?
 }
