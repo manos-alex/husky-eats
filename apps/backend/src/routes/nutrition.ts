@@ -5,6 +5,7 @@ import { requireApiKey } from "../middleware.js";
 const router = express.Router();
 
 interface NutritionFacts {
+    id: number,
     name: string,
     vegan: boolean | null,
     vegetarian: boolean | null,
@@ -15,20 +16,20 @@ interface NutritionFacts {
     containsnuts: boolean | null,
     servingsize: string,
     calories: number | null,
-    totalfat: string,
-    saturatedfat: string,
-    transfat: string,
-    cholesterol: string,
-    sodium: string,
-    calcium: string,
-    iron: string,
-    totalcarbohydrate: string,
-    dietaryfiber: string,
-    totalsugars: string,
-    addedsugars: string,
-    protein: string,
-    vitamind: string,
-    potassium: string,
+    totalfat_g: number | null,
+    saturatedfat_g: number | null,
+    transfat_g: number | null,
+    cholesterol_mg: number | null,
+    sodium_mg: number | null,
+    calcium_mg: number | null,
+    iron_mg: number | null,
+    totalcarbohydrate_g: number | null,
+    dietaryfiber_g: number | null,
+    totalsugars_g: number | null,
+    addedsugars_g: number | null,
+    protein_g: number | null,
+    vitamind_mcg: number | null,
+    potassium_mg: number | null,
     allergens: string,
 }
 
@@ -40,11 +41,12 @@ router.post("/nutrition", requireApiKey, async (req, res) => {
             nutrition_facts.map((nf: NutritionFacts) =>
                 prisma.menuItemInfo.upsert({
                     where: {
-                        name: nf.name
+                        id: nf.id,
                     },
                     update: {
                     },
                     create: {
+                        id: nf.id,
                         name: nf.name,
                         vegan: nf.vegan,
                         vegetarian: nf.vegetarian,
@@ -55,20 +57,20 @@ router.post("/nutrition", requireApiKey, async (req, res) => {
                         containsnuts: nf.containsnuts,
                         servingsize: nf.servingsize,
                         calories: nf.calories,
-                        totalfat: nf.totalfat,
-                        saturatedfat: nf.saturatedfat,
-                        transfat: nf.transfat,
-                        cholesterol: nf.cholesterol,
-                        sodium: nf.sodium,
-                        calcium: nf.calcium,
-                        iron: nf.iron,
-                        totalcarbohydrate: nf.totalcarbohydrate,
-                        dietaryfiber: nf.dietaryfiber,
-                        totalsugars: nf.totalsugars,
-                        addedsugars: nf.addedsugars,
-                        protein: nf.protein,
-                        vitamind: nf.vitamind,
-                        potassium: nf.potassium,
+                        totalfat_g: nf.totalfat_g,
+                        saturatedfat_g: nf.saturatedfat_g,
+                        transfat_g: nf.transfat_g,
+                        cholesterol_mg: nf.cholesterol_mg,
+                        sodium_mg: nf.sodium_mg,
+                        calcium_mg: nf.calcium_mg,
+                        iron_mg: nf.iron_mg,
+                        totalcarbohydrate_g: nf.totalcarbohydrate_g,
+                        dietaryfiber_g: nf.dietaryfiber_g,
+                        totalsugars_g: nf.totalsugars_g,
+                        addedsugars_g: nf.addedsugars_g,
+                        protein_g: nf.protein_g,
+                        vitamind_mcg: nf.vitamind_mcg,
+                        potassium_mg: nf.potassium_mg,
                         allergens: nf.allergens,
                     },
                 })
@@ -84,10 +86,11 @@ router.post("/nutrition", requireApiKey, async (req, res) => {
 
 router.get("/nutrition", async (req, res) => {
     try {
-        const { name } = req.query;
+        const { id, name } = req.query;
 
         const nutrition_facts = await prisma.menuItemInfo.findFirst({
             where: {
+                ...(id ? {id : Number(id)} : {}),
                 ...(name ? {name : String(name).toLowerCase()} : {}),
             }
         });

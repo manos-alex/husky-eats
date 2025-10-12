@@ -67,6 +67,7 @@ def scrapeNutrition(to_scrape={}):
 
         # Initialize nutrition facts
         nutrition_facts = {
+            "id": int(id),
             "name": soup.find(class_="labelrecipe").get_text().lower(),
             "vegan": None,
             "vegetarian": None,
@@ -75,23 +76,23 @@ def scrapeNutrition(to_scrape={}):
             "lesssodium": None,
             "nogarliconion": None,
             "containsnuts": None,
-            "servingsize": "N/A",
+            "servingsize": None,
             "calories": None,
-            "totalfat": "N/A",
-            "saturatedfat": "N/A",
-            "transfat": "N/A",
-            "cholesterol": "N/A",
-            "sodium": "N/A",
-            "calcium": "N/A",
-            "iron": "N/A",
-            "totalcarbohydrate": "N/A",
-            "dietaryfiber": "N/A",
-            "totalsugars": "N/A",
-            "addedsugars": "N/A",
-            "protein": "N/A",
-            "vitamind": "N/A",
-            "potassium": "N/A",
-            "allergens": "N/A",
+            "totalfat_g": None,
+            "saturatedfat_g": None,
+            "transfat_g": None,
+            "cholesterol_mg": None,
+            "sodium_mg": None,
+            "calcium_mg": None,
+            "iron_mg": None,
+            "totalcarbohydrate_g": None,
+            "dietaryfiber_g": None,
+            "totalsugars_g": None,
+            "addedsugars_g": None,
+            "protein_g": None,
+            "vitamind_mcg": None,
+            "potassium_mg": None,
+            "allergens": None,
         }
 
         # Check if information is available
@@ -101,19 +102,21 @@ def scrapeNutrition(to_scrape={}):
             continue
 
         # Find and loop through nutrients
-        nutr_keys = ["totalfat", "totalcarbohydrate", "saturatedfat", "dietaryfiber", "transfat", "totalsugars", "cholesterol", "addedsugars", "sodium", "protein", "calcium", "iron", "vitamind", "potassium"]
+        nutr_keys = ["totalfat_g", "totalcarbohydrate_g", "saturatedfat_g", "dietaryfiber_g", "transfat_g", "totalsugars_g", "cholesterol_mg", "addedsugars_g", "sodium_mg", "protein_g", "calcium_mg", "iron_mg", "vitamind_mcg", "potassium_mg"]
         nutr_values = []
         nutfactstopnutrient = soup.find_all(class_="nutfactstopnutrient")
         for nutrient in nutfactstopnutrient:
             text = nutrient.get_text(" ", strip=True)
 
             text = text.replace("\xa0", " ")
-            if "- - -" in text: 
-                nutr_values.append("N/A")
+            if "- - -" in text:
+                nutr_values.append(None)
             else:
                 match = re.search(r"(\d+\.?\d*)(g|mg|mcg)", text, re.IGNORECASE)
                 if match:
-                    nutr_values.append(match.group())
+                    value_str = match.groups()
+                    value = float(value_str)
+                    nutr_values.append(value)
         # Pair nutrient key and values
         nutrition_facts.update(dict(zip(nutr_keys, nutr_values)))
         

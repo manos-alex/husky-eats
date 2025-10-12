@@ -37,7 +37,8 @@ model MenuItem {
 }
 
 model MenuItemInfo {
-  name              String   @id
+  id                Int @id
+  name              String
   vegan             Boolean?
   vegetarian        Boolean?
   glutenfriendly    Boolean?
@@ -47,19 +48,19 @@ model MenuItemInfo {
   containsnuts      Boolean?
   servingsize       String?
   calories          Int?
-  totalfat          String?
-  saturatedfat      String?
-  transfat          String?
-  cholesterol       String?
-  sodium            String?
-  calcium           String?
-  iron              String?
-  totalcarbohydrate String?
-  dietaryfiber      String?
-  totalsugars       String?
-  addedsugars       String?
-  protein           String?
-  vitamind          String?
-  potassium         String?
+  totalfat_g          Float?
+  saturatedfat_g      Float?
+  transfat_g          Float?
+  cholesterol_mg       Float?
+  sodium_mg            Float?
+  calcium_mg           Float?
+  iron_mg              Float?
+  totalcarbohydrate_g Float?
+  dietaryfiber_g      Float?
+  totalsugars_g       Float?
+  addedsugars_g       Float?
+  protein_g           Float?
+  vitamind_mcg          Float?
+  potassium_mg         Float?
   allergens         String?
 }
