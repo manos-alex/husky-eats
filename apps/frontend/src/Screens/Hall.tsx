@@ -7,7 +7,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import "../../global.css";
 
 type RootStackParamList = {
-    Nutrition: { name: string };
+    Nutrition: { id: number };
 };
 
 export default function Hall({route}: any) {
@@ -29,7 +29,7 @@ export default function Hall({route}: any) {
         async function load() {
             try {
                 setLoading(true);
-                const d = new Date(2025, 8, 25);
+                const d = new Date();
                 const breakfastItemsRes = await getMenuItems({hallid: hall.id, date: d, meal: "Breakfast"});
                 const lunchItemsRes = await getMenuItems({hallid: hall.id, date: d, meal: "Lunch"});
                 const dinnerItemsRes = await getMenuItems({hallid: hall.id, date: d, meal: "Dinner"});
@@ -89,7 +89,7 @@ export default function Hall({route}: any) {
                                 {displayItems.filter(item => item.station === station).map((menuItem, index) => (
                                     <Pressable
                                         key={index}
-                                        onPress={() => navigation.navigate("Nutrition", {name: menuItem.name})}>
+                                        onPress={() => navigation.navigate("Nutrition", {id: menuItem.id})}>
                                         <Text className="font-gotham text-[24px] text-[#DDD] px-8 py-6">{menuItem.name}</Text>
                                     </Pressable>
                                 ))}

@@ -8,14 +8,14 @@ export default function Nutrition({route}: any) {
     const [nutritionFacts, setNutritionFacts] = useState<NutritionFacts | {}>({});
     const [loading, setLoading] = useState(true);
 
-    const name = route.params.name;
+    const id = route.params.id;
 
     useEffect(() => {
         async function load() {
             try {
                 setLoading(true);
 
-                const nfRes = await getNutritionFacts({name});
+                const nfRes = await getNutritionFacts({id});
                 setNutritionFacts(nfRes);
 
                 setLoading(false);

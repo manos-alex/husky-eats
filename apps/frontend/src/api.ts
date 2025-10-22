@@ -57,17 +57,16 @@ const baseURL: string =
         "http://172.27.30.61:4000";
 
 export async function checkAPI() {
-    const res = await fetch(`${baseURL}/api`);
+    const res = await fetch(`${baseURL}`);
     if (!res.ok) throw new Error("Could not connect to API");
     return res.json() as Promise<{ ok: boolean}>;
 }
 
-export async function getDiningHalls({ id, name } : {id?: number, name?: string}) {
-    const params = new URLSearchParams();
-    if (id) params.append("id", id.toString());
-    if (name) params.append("name", name);
-
-    const res = await fetch(`${baseURL}/api/dininghall?${params.toString()}`);
+export async function getDiningHalls({ id } : {id?: number}) {
+    let path = ""
+    if (id) path = `${baseURL}/dininghall/${id}`
+    else path = `${baseURL}/dininghall`
+    const res = await fetch(path);
     return res.json();
 }
 
@@ -77,14 +76,11 @@ export async function getMenuItems({ meal, hallid, date } : {meal?: string, hall
     if (date) params.append("date", date.toISOString().split("T")[0]);
     if (hallid) params.append("hallid", hallid.toString());
 
-    const res = await fetch(`${baseURL}/api/menuitem?${params.toString()}`);
+    const res = await fetch(`${baseURL}/menu?${params.toString()}`);
     return res.json();
 }
 
-export async function getNutritionFacts({ name } : {name?: string}) {
-    const params = new URLSearchParams();
-    if (name) params.append("name", name);
-
-    const res = await fetch(`${baseURL}/api/nutrition?${params.toString()}`);
+export async function getNutritionFacts({ id } : {id?: number}) {
+    const res = await fetch(`${baseURL}/menuitem/${id}`);
     return res.json();
 }
