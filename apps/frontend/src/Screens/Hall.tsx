@@ -38,7 +38,9 @@ export default function Hall({route}: any) {
                 setLunchItems(lunchItemsRes);
                 setDinnerItems(dinnerItemsRes);
 
-                setDisplayItems(breakfastItemsRes);
+                if (curMeal === "Breakfast") setDisplayItems(breakfastItemsRes);
+                else if (curMeal === "Lunch") setDisplayItems(lunchItemsRes);
+                else if (curMeal === "Dinner") setDisplayItems(dinnerItemsRes);
                 setLoading(false);
             } catch (err) {
                 console.log(err);
@@ -66,7 +68,15 @@ export default function Hall({route}: any) {
     return (
         <SafeAreaView className="flex-1 bg-[#1e1e1e]">
             <View className="items-center">
-                <Text className="font-gotham mt-2 text-[36px] text-[#DDD]" >{hall.name}</Text>
+                <View className='flex-row w-full justify-around items-center'>
+                    <Pressable onPress={() => navigation.goBack()}>
+                        <Text className='font-lexend text-[32px] text-white p-5'>{'<'}</Text>
+                    </Pressable>
+                    <Text className="font-gotham mt-2 text-[36px] text-[#DDD]" >{hall.name}</Text>
+                    <Pressable onPress={() => navigation.goBack()}>
+                        <Text className='font-lexend text-[32px] text-white p-5'></Text>
+                    </Pressable>
+                </View>
                 <View className="flex-row items-center mt-2" >
                     <Pressable className={`px-4 py-2 flex-1 ${curMeal === "Breakfast" ? "border-b-4 border-blue-900" : ""}`} onPress={() => changeMeal("Breakfast")} >
                         <Text className="font-lexend text-[#DDD] text-center text-[20px]" >Breakfast</Text>
