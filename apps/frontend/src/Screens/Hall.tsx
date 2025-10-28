@@ -66,16 +66,16 @@ export default function Hall({route}: any) {
     return (
         <SafeAreaView className="flex-1 bg-[#1e1e1e]">
             <View className="items-center">
-                <Text className="font-museo mt-2 text-[36px] text-[#DDD]" >{hall.name}</Text>
+                <Text className="font-gotham mt-2 text-[36px] text-[#DDD]" >{hall.name}</Text>
                 <View className="flex-row items-center mt-2" >
                     <Pressable className={`px-4 py-2 flex-1 ${curMeal === "Breakfast" ? "border-b-4 border-blue-900" : ""}`} onPress={() => changeMeal("Breakfast")} >
-                        <Text className="font-museo text-[#DDD] text-center text-[24px]" >Breakfast</Text>
+                        <Text className="font-lexend text-[#DDD] text-center text-[20px]" >Breakfast</Text>
                     </Pressable>
                     <Pressable className={`px-4 py-2 flex-1 ${curMeal === "Lunch" ? "border-b-4 border-blue-900" : ""}`} onPress={() => changeMeal("Lunch")} >
-                        <Text className="font-museo text-[#DDD] text-center text-[24px]" >Lunch</Text>
+                        <Text className="font-lexend text-[#DDD] text-center text-[20px]" >Lunch</Text>
                     </Pressable>
                     <Pressable className={`px-4 py-2 flex-1 ${curMeal === "Dinner" ? "border-b-4 border-blue-900" : ""}`} onPress={() => changeMeal("Dinner")}>
-                        <Text className="font-museo text-[#DDD] text-center text-[24px]" >Dinner</Text>
+                        <Text className="font-lexend text-[#DDD] text-center text-[20px]" >Dinner</Text>
                     </Pressable>
                 </View>
             </View>
@@ -85,12 +85,12 @@ export default function Hall({route}: any) {
                         <View className="flex-1">
                         {[...new Set(displayItems.map(item => item.station))].map(station => (
                             <View key={station}>
-                                <Text className="font-museo text-[32px] text-[#FFF] bg-[#1e1e1e] px-8 py-4">{station}</Text>
+                                <Text className="font-lexend text-[28px] text-[#FFF] bg-[#1e1e1e] px-8 py-4">{station}</Text>
                                 {displayItems.filter(item => item.station === station).map((menuItem, index) => (
                                     <Pressable
                                         key={index}
                                         onPress={() => navigation.navigate("Nutrition", {id: menuItem.id})}>
-                                        <Text className="font-gotham text-[24px] text-[#DDD] px-8 py-6">{menuItem.name}</Text>
+                                        <Text className="font-lexend font-light text-[24px] text-[#DDD] px-8 py-6">{menuItem.name}</Text>
                                     </Pressable>
                                 ))}
                             </View>

@@ -7,6 +7,7 @@ module.exports = {
       fontFamily: {
         museo: ["Museo"],
         gotham: ["Gotham"],
+        lexend: ["Lexend"],
       },
     },
   },

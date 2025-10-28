@@ -34,10 +34,10 @@ export default function Home({ navigation }: any) {
                             key={index}
                             onPress={() => navigation.navigate("Hall", {hall: hall, meal: findMealtime(hall)[0]})}>
                             <View className='flex-row justify-between'>
-                                <Text className="font-museo text-[32px] text-[#DDD]" >{hall.name}</Text>
-                                <Text className="font-museo text-[24px] text-[#DDD]" >{findMealtime(hall)[0]}</Text>
+                                <Text className="font-lexend text-[32px] text-[#DDD]" >{hall.name}</Text>
+                                <Text className="font-lexend text-[24px] text-[#DDD]" >{findMealtime(hall)[0]}</Text>
                             </View>
-                            <Text className="font-museo text-[20px] text-[#DDD] text-right" >{findMealtime(hall)[1]}</Text>
+                            <Text className="font-lexend font-light text-[20px] text-[#DDD] text-right" >{findMealtime(hall)[1]}</Text>
                         </Pressable>
                     ))}
                     <StatusBar style="auto" />

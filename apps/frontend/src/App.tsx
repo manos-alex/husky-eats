@@ -15,6 +15,7 @@ export default function App() {
     const [ready] = useFonts({
         Museo: require("./assets/fonts/MuseoSans-500.otf"),
         Gotham: require("./assets/fonts/Gotham-Light.otf"),
+        Lexend: require("./assets/fonts/Lexend-VariableFont_wght.ttf")
     });
 
     return (
