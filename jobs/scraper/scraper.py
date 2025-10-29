@@ -115,7 +115,7 @@ def scrapeNutrition(to_scrape={}):
                 match = re.search(r"(\d+\.?\d*)(g|mg|mcg)", text, re.IGNORECASE)
                 if match:
                     value_str = match.groups()
-                    value = float(value_str)
+                    value = float(value_str[0])
                     nutr_values.append(value)
         # Pair nutrient key and values
         nutrition_facts.update(dict(zip(nutr_keys, nutr_values)))
