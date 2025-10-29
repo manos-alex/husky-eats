@@ -1,0 +1,29 @@
+name: Scraper
+
+on:
+    schedule:
+        - cron: "0 13 * * *"
+    workflow_dispatch: {}
+
+jobs:
+    run-scraper:
+        runs-on: ubuntu-latest
+        env:
+            API_KEY: ${{ secrets.API_KEY }}
+            MENUITEM_API_URL: ${{ secrets.MENUITEM_API_URL }}
+            NUTRITIONFACT_API_URL: ${{ secrets.NUTRITIONFACT_API_URL }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                python-version: "3.11"
+                cache: "pip"
+            
+            - name: Run scraper
+              run: |
+                cd jobs/scraper
+                pip install -r requirements.txt
+                python3 main.py

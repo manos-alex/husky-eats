@@ -165,4 +165,4 @@ def push_menuitems(hall_id, mealtime, date=datetime.today()):
     r = requests.post(NUTRITIONFACT_API_URL, headers=headers, json=nutritionfacts)
     r.raise_for_status()
 
-    print("Response:", r.json(), "for", hall_id, mealtime)
+    print("Response:", r.json(), "for", hall_id, mealtime, date)

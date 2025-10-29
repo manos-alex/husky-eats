@@ -1,5 +1,6 @@
 import requests
 from scraper import push_menuitems
+from datetime import datetime, timedelta
 
 if __name__ == "__main__":
     res = requests.get("https://husky-eats.onrender.com/api/dininghall?")
@@ -10,4 +11,4 @@ if __name__ == "__main__":
 
     for hall_id in halls:
         for mealtime in mealtimes:
-            push_menuitems(hall_id, mealtime)
+            push_menuitems(hall_id, mealtime, (datetime.today()+timedelta(weeks=2)).date())
