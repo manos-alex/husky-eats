@@ -21,13 +21,19 @@ def scrapeMenu(hall_id='01', date=datetime.today(), mealtime='Lunch'):
         if s.get_text(strip=True)
     ]
 
+    # Get all menu items that are already in the database
+    MENUITEM_API_URL = os.getenv("MENUITEM_API_URL")
+    scraped_data = requests.get(MENUITEM_API_URL)
+    scraped_ids = {item["id"]: item["name"] for item in scraped_data.json()}
+
     # Find all menu item ids
     item_ids = {}
     id_servsize = {}    # Store ids and serving sizes to scrape nutrition facts
     for s in soup.find_all(attrs={"name": "recipe"}):
         item_value = s["value"].split("*")
         item_ids[s.parent.text] = int(item_value[0])
-        id_servsize[item_value[0]] = item_value[1]
+        if int(item_value[0]) not in scraped_ids:
+            id_servsize[item_value[0]] = item_value[1]
 
     # Make objects for each menu item
     menuitem_data = []
