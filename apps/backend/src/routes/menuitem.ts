@@ -54,8 +54,8 @@ router.post("/menuitem", requireApiKey, async (req, res) => {
 
 router.get("/menuitem", async (req, res) => {
     try {
-        const menuitems = await prisma.menuItem.findMany({
-            orderBy: { station: "desc" },
+        const menuitems = await prisma.menuItemInfo.findMany({
+            orderBy: { name: "asc" },
         });
 
         res.json(menuitems);
