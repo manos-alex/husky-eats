@@ -7,7 +7,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import "../../global.css";
 
 type RootStackParamList = {
-    Nutrition: { id: number };
+    Nutrition: { id: number, name: string };
 };
 
 export default function Hall({route}: any) {
@@ -66,7 +66,7 @@ export default function Hall({route}: any) {
     }
 
     return (
-        <SafeAreaView className="flex-1 bg-[#1e1e1e]">
+        <SafeAreaView className="flex-1 bg-[#252525]">
             <View className="items-center">
                 <View className='flex-row w-full justify-around items-center'>
                     <Pressable onPress={() => navigation.goBack()}>
@@ -89,19 +89,24 @@ export default function Hall({route}: any) {
                     </Pressable>
                 </View>
             </View>
-            <ScrollView className="flex-1 bg-[#252525]">
+            <ScrollView className="flex-1 bg-[#2e2e2e]">
                 <View className="flex-1 justify-center">
                     {!loading ?
                         <View className="flex-1">
                         {[...new Set(displayItems.map(item => item.station))].map(station => (
                             <View key={station}>
-                                <Text className="font-lexend text-[28px] text-[#FFF] bg-[#1e1e1e] px-8 py-4">{station}</Text>
-                                {displayItems.filter(item => item.station === station).map((menuItem, index) => (
-                                    <Pressable
-                                        key={index}
-                                        onPress={() => navigation.navigate("Nutrition", {id: menuItem.id})}>
-                                        <Text className="font-lexend font-light text-[24px] text-[#DDD] px-8 py-6">{menuItem.name}</Text>
-                                    </Pressable>
+                                <Text className="font-lexend text-[28px] text-[#FFF] bg-[#38425A] px-4 py-2">{station}</Text>
+                                {displayItems.filter(item => item.station === station).map((menuItem, index, arr) => (
+                                    <View key={index}>
+                                        <Pressable
+                                            key={index}
+                                            onPress={() => navigation.navigate("Nutrition", {id: menuItem.id, name: menuItem.name})}>
+                                            <Text className="font-lexend font-light text-[24px] text-[#DDD] px-8 py-6">{menuItem.name}</Text>
+                                        </Pressable>
+                                        {index !== arr.length - 1 && (
+                                            <View className="w-[90%] h-0.5 bg-[#4A4A4A] self-center" />
+                                        )}
+                                    </View>
                                 ))}
                             </View>
                         ))}

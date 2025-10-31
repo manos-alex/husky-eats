@@ -23,11 +23,11 @@ export default function Home({ navigation }: any) {
     }, []);
 
     return (
-        <SafeAreaView className="flex-1 bg-[#1e1e1e]">
+        <SafeAreaView className="flex-1 bg-[#252525]">
             <View className="p-4">
                 <Text className="font-gotham text-[#DDD] text-[48px] text-center">HuskyEats</Text>
             </View>
-            <ScrollView className="flex-1 bg-[#252525]">
+            <ScrollView className="flex-1 bg-[#2e2e2e]">
                 <View className="items-center my-6">
                     {halls.map((hall, index) => (
                         <Pressable className="border-[2px] border-[#1F1F1F] bg-[#1a1a1a] rounded-[30px] w-[95%] h-[120px] my-2 p-5 flex-col justify-between"
