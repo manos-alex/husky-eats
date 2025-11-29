@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./Screens/Home";
 import Hall from "./Screens/Hall";
 import Nutrition from "./Screens/Nutrition";
+import MenuMatch from "./Screens/MenuMatch";
 import { useFonts } from "expo-font";
 import "../global.css";
 
@@ -25,6 +26,7 @@ export default function App() {
                     <Stack.Screen name="Home" component={Home}/>
                     <Stack.Screen name="Hall" component={Hall}/>
                     <Stack.Screen name="Nutrition" component={Nutrition}/>
+                    <Stack.Screen name="MenuMatch" component={MenuMatch}/>
                 </Stack.Navigator>
             </NavigationContainer>
         </SafeAreaProvider>

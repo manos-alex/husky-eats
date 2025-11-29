@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Text, View, ScrollView, Pressable } from 'react-native';
+import { Text, View, ScrollView, Pressable, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { getDiningHalls, DiningHall } from '../api';
+import menuMatchIcon from '../assets/menumatch.png';
 import "../../global.css";
 
 export default function Home({ navigation }: any) {
@@ -24,8 +25,12 @@ export default function Home({ navigation }: any) {
 
     return (
         <SafeAreaView className="flex-1 bg-[#252525]">
-            <View className="p-4">
+            <View className="flex-row items-center justify-between p-4">
+                <Pressable className="self-start" onPress={() => navigation.navigate("MenuMatch")}>
+                    <Image source={menuMatchIcon} style={{width: 60, height: 60}} resizeMode="contain" />
+                </Pressable>
                 <Text className="font-gotham text-[#DDD] text-[48px] text-center">HuskyEats</Text>
+                <Pressable className="self-start" style={{width: 60, height: 60}} />
             </View>
             <ScrollView className="flex-1 bg-[#2e2e2e]">
                 <View className="items-center my-6">
