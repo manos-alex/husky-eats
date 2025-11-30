@@ -53,6 +53,12 @@ export interface NutritionFacts {
     allergens: string,
 }
 
+export interface ItemMatch {
+    id: string,
+    name: string,
+    servings: number,
+}
+
 const baseURL: string = 
         (Constants.expoConfig?.extra?.API_BASEURL as string) ||
         "http://172.27.30.61:4000";

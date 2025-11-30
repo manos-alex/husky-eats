@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from '@react-native-picker/picker';
 import { DatePicker } from '../../components/nativewindui/DatePicker';
 import * as ImagePicker from "expo-image-picker";
+import { ItemMatch } from '../api';
 import "../../global.css";
 
 export default function MenuMatch() {
@@ -14,6 +15,8 @@ export default function MenuMatch() {
     const [date, setDate] = useState<Date>(new Date());
 
     const [image, setImage] = useState<string | null>(null);
+
+    const [result, setResult] = useState<ItemMatch[]>([]);
 
     const pickImage = async () => {
         // Ask for media library permissions
@@ -42,7 +45,27 @@ export default function MenuMatch() {
     }
 
     const predict = async () => {
+        try {
+            if (image) {
+                const img = await fetch(image);
+                const blob = await img.blob();
 
+                const res = await fetch("https://busy-outreach-virtue-lauderdale.trycloudflare.com/predict?dining_hall_id=5&meal_time=lunch&meal_date=2025-11-25", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "image/png",
+                    },
+                    body: blob,
+                });
+
+                const data = await res.json();
+                console.log(data);
+                setResult(data);
+                setScreen("results");
+            }
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     const formatDate = (value: Date) => {
@@ -137,7 +160,7 @@ export default function MenuMatch() {
                         <Pressable
                             className="mt-20 bg-[#2071f5] p-3 w-auto rounded-[5px] self-center"
                             onPress={predict}>
-                            <Text className="font-lexend font-bold text-[32px] text-[#deebff] text-center">Analyze</Text>
+                            <Text className="font-lexend font-bold text-[32px] text-[#deebff] text-center">Calculate</Text>
                         </Pressable>
                     </View>
                 </View>
@@ -145,6 +168,13 @@ export default function MenuMatch() {
             </>
             ) : (
             <>
+                {result.map((item, index) => (
+                    <Text
+                        className="font-lexend text-[24px] text-[#DDD]" 
+                        key={index}>
+                        {item.name} {item.servings}
+                    </Text>
+                ))}
             </>
             )
             }
