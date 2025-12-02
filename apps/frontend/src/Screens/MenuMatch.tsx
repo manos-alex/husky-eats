@@ -19,12 +19,12 @@ const halls: Record<number, string> = {
 }
 
 const cardColors = [
-    "#F7D7A3",
-    "#8FC6A9",
-    "#F2A7A5",
-    "#F9F3A6",
-    "#7FB2D9",
-    "#D6C8F5",
+    "#7A6B51", // darker #F7D7A3
+    "#3C584C", // darker #8FC6A9
+    "#7A5453", // darker #F2A7A5
+    "#7A7751", // darker #F9F3A6
+    "#3A5468", // darker #7FB2D9
+    "#68627C", // darker #D6C8F5
 ]
 
 const result: ItemMatch[] = [
@@ -198,7 +198,7 @@ export default function MenuMatch() {
                     <Picker.Item label="Dinner" value="dinner" />
                 </Picker>
 
-                <View style={{ marginHorizontal: 125 }}>
+                <View style={{ marginHorizontal: 140 }}>
                     <DatePicker
                         value={date}
                         mode="date"
@@ -263,9 +263,47 @@ export default function MenuMatch() {
             <>
                 <Text className="mt-3 font-lexend font-light text-[#888] text-[20px] text-center" >Here is the breakdown...</Text>
 
-                <Text className="font-lexend text-[16px] text-[#DDD]">{totals.calories} {totals.carbs} {totals.protein} {totals.fat}</Text>
+                <View className="self-center w-[90%]">
+                    <Text className="mt-5 font-lexend font-bold text-[42px] text-[#DDD]">
+                        {totals.calories.toFixed(1)}
+                        <Text className="font-lexend font-light text-[30px] text-[#DDD]"> cals</Text>
+                    </Text>
+                    <View className="flex-row justify-around">
+                        <Text className="font-lexend text-[20px] text-[#DDD]">
+                            {totals.protein}g
+                            <Text className="font-light text-[16px]"> protein</Text>
+                        </Text>
+                        <Text className="font-lexend text-[20px] text-[#DDD]">
+                            {totals.carbs}g
+                            <Text className="font-light text-[16px]"> carbs</Text>
+                        </Text>
+                        <Text className="font-lexend text-[20px] text-[#DDD]">
+                            {totals.fat}g
+                            <Text className="font-light text-[16px]"> fat</Text>
+                        </Text>
+                    </View>
+                </View>
+
+                {/* <View className="self-center mt-4">
+                    <View className="flex-row">
+                        <View className="mx-5 my-1 p-2 w-[150px] h-[50px] rounded-[10px] border-[1px] border-[#888] flex justify-center items-center bg-[#18184a]">
+                            <Text className="font-lexend font-bold text-[16px] text-[#DDD]">{totals.calories.toFixed(1)} calories</Text>
+                        </View>
+                        <View className="mx-5 my-1 p-2 w-[150px] h-[50px] rounded-[10px] border-[1px] border-[#888] flex justify-center items-center bg-[#612525]">
+                            <Text className="font-lexend font-bold text-[16px] text-[#DDD]">{totals.carbs.toFixed(1)}g carbs</Text>
+                        </View>
+                    </View>
+                    <View className="flex-row">
+                        <View className="mx-5 my-1 p-2 w-[150px] h-[50px] rounded-[10px] border-[1px] border-[#888] flex justify-center items-center bg-[#695f32]">
+                            <Text className="font-lexend font-bold text-[16px] text-[#DDD]">{totals.protein.toFixed(1)}g protein</Text>
+                        </View>
+                        <View className="mx-5 my-1 p-2 w-[150px] h-[50px] rounded-[10px] border-[1px] border-[#888] flex justify-center items-center bg-[#2c522c]">
+                            <Text className="font-lexend font-bold text-[16px] text-[#DDD]">{totals.fat.toFixed(1)}g fat</Text>
+                        </View>
+                    </View>
+                </View> */}
                 
-                <ScrollView>
+                <ScrollView className="mt-10">
                     <View className="flex-1 items-center">
                     {result.map((item, index) => {
                         const nf = nutrition.find((n) => n.id === Number(item.id));
@@ -274,22 +312,24 @@ export default function MenuMatch() {
 
                         return (
                             <View
-                                className="m-3 w-[95%] rounded-[10px] border-[1px] border-black p-4 bg-black flex"
+                                className="m-3 w-[95%] rounded-[10px] border-[2px] border-[#CCC] p-4 bg-black flex"
                                 style={{ backgroundColor: bgColor }}
                                 key={item.id}>
-                                <Text className="font-lexend font-bold text-[30px] text-[#000]" >{item.name}</Text>
+                                <Text className="font-lexend text-[30px] text-[#DDD]" >{item.name}</Text>
                                 <View className="flex">
-                                <View>
-                                    <Text className="font-lexend text-[24px] text-[#000]">Serving Size: {nf.servingsize}</Text>
-                                    <Text className="font-lexend text-[24px] text-[#000]">Number of Servings: {item.servings}</Text>
-                                </View>
-                                    <View className="flex-row justify-around">
-                                        <Text className="font-lexend font-light text-[20px] text-[#000]">{((nf.calories ?? 0) * item.servings).toFixed(1)} calories</Text>
-                                        <Text className="font-lexend font-light text-[20px] text-[#000]">{((nf.totalcarbohydrate_g ?? 0) * item.servings).toFixed(1)}g carbs</Text>
+                                    <View className="m-3">
+                                        <Text className="font-lexend text-[24px] text-[#DDD]">Serving Size: {nf.servingsize}</Text>
+                                        <Text className="font-lexend text-[24px] text-[#DDD]">Number of Servings: {item.servings}</Text>
                                     </View>
                                     <View className="flex-row justify-around">
-                                        <Text className="font-lexend font-light text-[20px] text-[#000]">{((nf.protein_g ?? 0) * item.servings).toFixed(1)}g protein</Text>
-                                        <Text className="font-lexend font-light text-[20px] text-[#000]">{((nf.totalfat_g ?? 0) * item.servings).toFixed(1)}g fat</Text>
+                                        <View className="flex-col justify-around">
+                                            <Text className="font-lexend font-light text-[20px] text-[#DDD]">{((nf.calories ?? 0) * item.servings).toFixed(1)} calories</Text>
+                                            <Text className="font-lexend font-light text-[20px] text-[#DDD]">{((nf.protein_g ?? 0) * item.servings).toFixed(1)}g protein</Text>
+                                        </View>
+                                        <View className="flex-col justify-around">
+                                            <Text className="font-lexend font-light text-[20px] text-[#DDD]">{((nf.totalcarbohydrate_g ?? 0) * item.servings).toFixed(1)}g carbs</Text>
+                                            <Text className="font-lexend font-light text-[20px] text-[#DDD]">{((nf.totalfat_g ?? 0) * item.servings).toFixed(1)}g fat</Text>
+                                        </View>
                                     </View>
                                 </View>
                             </View>
