@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from '@react-native-picker/picker';
 import { DatePicker } from '../../components/nativewindui/DatePicker';
 import * as ImagePicker from "expo-image-picker";
+import { Circle } from "react-native-progress";
 import { getNutritionFacts, NutritionFacts, ItemMatch } from '../api';
 import "../../global.css";
 
@@ -26,6 +27,13 @@ const cardColors = [
     "#3A5468", // darker #7FB2D9
     "#68627C", // darker #D6C8F5
 ]
+
+const DailyValue = {
+    calories: 2000,
+    protein: 50,
+    carbs: 275,
+    fat: 78,
+}
 
 const result: ItemMatch[] = [
     {name: "Cross Trax French Fries", id: "161069", servings: 0.75},
@@ -153,6 +161,12 @@ export default function MenuMatch() {
         );
     }, [result, nutrition]);
 
+    const nutrientCircles = [
+        {key: "Protein", total: totals.protein, dailyV: DailyValue.protein},
+        {key: "Carbs", total: totals.carbs, dailyV: DailyValue.carbs},
+        {key: "Fat", total: totals.fat, dailyV: DailyValue.fat},
+    ]
+
     return (
         <SafeAreaView className="flex-1 bg-[#252525]">
             <Text className="mt-8 font-gotham text-[#DDD] text-[40px] text-center">Welcome to</Text>
@@ -263,47 +277,38 @@ export default function MenuMatch() {
             <>
                 <Text className="mt-3 font-lexend font-light text-[#888] text-[20px] text-center" >Here is the breakdown...</Text>
 
-                <View className="self-center w-[90%]">
-                    <Text className="mt-5 font-lexend font-bold text-[42px] text-[#DDD]">
-                        {totals.calories.toFixed(1)}
-                        <Text className="font-lexend font-light text-[30px] text-[#DDD]"> cals</Text>
+                <View className="self-center w-[100%]">
+                    <Text className="mt-5 mx-5 font-lexend font-bold text-[42px] text-[#DDD]">
+                        {totals.calories.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                        <Text className="font-lexend font-light text-[30px] text-[#DDD]"> calories</Text>
                     </Text>
-                    <View className="flex-row justify-around">
-                        <Text className="font-lexend text-[20px] text-[#DDD]">
-                            {totals.protein}g
-                            <Text className="font-light text-[16px]"> protein</Text>
-                        </Text>
-                        <Text className="font-lexend text-[20px] text-[#DDD]">
-                            {totals.carbs}g
-                            <Text className="font-light text-[16px]"> carbs</Text>
-                        </Text>
-                        <Text className="font-lexend text-[20px] text-[#DDD]">
-                            {totals.fat}g
-                            <Text className="font-light text-[16px]"> fat</Text>
-                        </Text>
+                    <View className="mt-3 flex-row justify-around">
+                        {nutrientCircles.map(({ key, total, dailyV}) => (
+                        <View key={key}>
+                            <View className="items-center justify-center">
+                                <Circle
+                                    progress={total/dailyV}
+                                    size={125}
+                                    thickness={3}
+                                    color="#2ECC71"
+                                    unfilledColor="#555"
+                                    borderWidth={0}
+                                />
+                                <View className="absolute items-center">
+                                    <Text className="font-lexend text-[20px] text-[#DDD]">
+                                        {total.toFixed(1)}
+                                        <Text className="font-light text-[16px]"> g</Text>
+                                    </Text>
+                                    <Text className="mt-1 font-lexend text-[16px] text-[#DDD]"> {((total/dailyV)*100).toFixed(1)}% DV</Text>
+                                </View>
+                            </View>
+                            <Text className="mt-3 self-center font-lexend text-[16px] text-[#DDD]"> {key}</Text>
+                        </View>
+                        ))}
                     </View>
                 </View>
-
-                {/* <View className="self-center mt-4">
-                    <View className="flex-row">
-                        <View className="mx-5 my-1 p-2 w-[150px] h-[50px] rounded-[10px] border-[1px] border-[#888] flex justify-center items-center bg-[#18184a]">
-                            <Text className="font-lexend font-bold text-[16px] text-[#DDD]">{totals.calories.toFixed(1)} calories</Text>
-                        </View>
-                        <View className="mx-5 my-1 p-2 w-[150px] h-[50px] rounded-[10px] border-[1px] border-[#888] flex justify-center items-center bg-[#612525]">
-                            <Text className="font-lexend font-bold text-[16px] text-[#DDD]">{totals.carbs.toFixed(1)}g carbs</Text>
-                        </View>
-                    </View>
-                    <View className="flex-row">
-                        <View className="mx-5 my-1 p-2 w-[150px] h-[50px] rounded-[10px] border-[1px] border-[#888] flex justify-center items-center bg-[#695f32]">
-                            <Text className="font-lexend font-bold text-[16px] text-[#DDD]">{totals.protein.toFixed(1)}g protein</Text>
-                        </View>
-                        <View className="mx-5 my-1 p-2 w-[150px] h-[50px] rounded-[10px] border-[1px] border-[#888] flex justify-center items-center bg-[#2c522c]">
-                            <Text className="font-lexend font-bold text-[16px] text-[#DDD]">{totals.fat.toFixed(1)}g fat</Text>
-                        </View>
-                    </View>
-                </View> */}
                 
-                <ScrollView className="mt-10">
+                <ScrollView className="mt-5">
                     <View className="flex-1 items-center">
                     {result.map((item, index) => {
                         const nf = nutrition.find((n) => n.id === Number(item.id));
