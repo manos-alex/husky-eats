@@ -29,11 +29,11 @@ const halls: Record<number, string> = {
 // ]
 
 const cardColors = [
-    {fill: "#6D8B6C", stroke: "#527751"},
     {fill: "#967335", stroke: "#704700"},
+    {fill: "#6D8B6C", stroke: "#527751"},
     {fill: "#A15654", stroke: "#6D0B09"},
-    {fill: "#B4AC3E", stroke: "#958B10"},
     {fill: "#5C7180", stroke: "#3A5468"},
+    {fill: "#B4AC3E", stroke: "#958B10"},
     {fill: "#797293", stroke: "#5F4F99"},
 ]
 
@@ -45,8 +45,8 @@ const DailyValue = {
 }
 
 const result: ItemMatch[] = [
-    {name: "Cross Trax French Fries", id: "161069", servings: 0.75},
     {name: "Fried Chicken Nuggets", id: "111037", servings: 2},
+    {name: "Cross Trax French Fries", id: "161069", servings: 0.75},
     {name: "Corn", id: "171012", servings: 1},
 ]
 
@@ -178,7 +178,9 @@ export default function MenuMatch() {
 
     return (
         <SafeAreaView className="flex-1 bg-[#252525]">
-            <Text className="mt-8 font-gotham text-[#DDD] text-[40px] text-center">Welcome to</Text>
+            {screen === "upload" && (    
+                <Text className="mt-8 font-gotham text-[#DDD] text-[40px] text-center">Welcome to</Text>
+            )}
             <Text className="font-lexend text-[#DDD] text-[48px] text-center">MenuMatch</Text>
             {screen === "upload" ? (
             <>
@@ -291,7 +293,11 @@ export default function MenuMatch() {
                         {totals.calories.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                         <Text className="font-lexend font-light text-[30px] text-[#DDD]"> calories</Text>
                     </Text>
-                    <View className="mt-3 flex-row justify-around">
+                </View>
+                
+                <ScrollView className="mt-5">
+                    <View className="flex-1 items-center">
+                    <View className="my-3 w-full flex-row justify-around">
                         {nutrientCircles.map(({ key, total, dailyV}) => (
                         <View key={key}>
                             <View className="items-center justify-center">
@@ -315,10 +321,6 @@ export default function MenuMatch() {
                         </View>
                         ))}
                     </View>
-                </View>
-                
-                <ScrollView className="mt-5">
-                    <View className="flex-1 items-center">
                     {result.map((item, index) => {
                         const nf = nutrition.find((n) => n.id === Number(item.id));
                         if (!nf) return null;
