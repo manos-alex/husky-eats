@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ScrollView, Pressable, Text, View, Image, Alert } from 'react-native';
+import { ScrollView, Pressable, Text, View, Image, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from '@react-native-picker/picker';
 import { DatePicker } from '../../components/nativewindui/DatePicker';
@@ -145,6 +145,13 @@ export default function MenuMatch() {
         }
     }
 
+    const loadResults = () => {
+        setScreen("loading");
+        setTimeout(() => {
+            handleCalculate();
+        }, 7000);
+    }
+
     const handleCalculate = async () => {
         const items = await predict();
         if (items.length) {
@@ -276,7 +283,7 @@ export default function MenuMatch() {
                         </Pressable>
                         <Pressable
                             className="mt-20 bg-[#2071f5] p-3 w-auto rounded-[5px] self-center"
-                            onPress={handleCalculate}
+                            onPress={loadResults}
                             >
                             <Text className="font-lexend font-bold text-[32px] text-[#deebff] text-center">Calculate</Text>
                         </Pressable>
@@ -284,6 +291,11 @@ export default function MenuMatch() {
                 </View>
 
             </>
+            ) : screen === "loading" ? (
+                <View className="flex-1 justify-center items-center">
+                    <ActivityIndicator size="large" color="#2ECC71" />
+                    <Text className="mt-10 font-lexend font-light text-[#888] text-[20px]">Calculating results...</Text>
+                </View>
             ) : (
             <>
                 <Text className="mt-3 font-lexend font-light text-[#888] text-[20px] text-center" >Here is the breakdown...</Text>
