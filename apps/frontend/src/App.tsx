@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./Screens/Home";
 import Hall from "./Screens/Hall";
 import Nutrition from "./Screens/Nutrition";
-import MenuMatch from "./Screens/MenuMatch";
+import MenuMatch from "./Screens/MenuMatch/MenuMatch";
 import { useFonts } from "expo-font";
 import "../global.css";
 
