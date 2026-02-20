@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Alert, Text } from "react-native";
+import { Alert, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { getNutritionFacts, ItemMatch, NutritionFacts } from "../../api";
@@ -143,14 +143,58 @@ export default function MenuMatch() {
         {key: "Protein", total: totals.protein, dailyV: DailyValue.protein},
         {key: "Carbs", total: totals.carbs, dailyV: DailyValue.carbs},
         {key: "Fat", total: totals.fat, dailyV: DailyValue.fat},
-    ]
+    ];
+
+    const screenTitle: Record<MenuMatchScreen, string> = {
+        upload: "MenuMatch",
+        details: "Meal Details",
+        review: "Review Meal",
+        loading: "Calculating",
+        results: "Results",
+    };
+
+    const showBack = screen === "details" || screen === "review" || screen === "results";
+
+    const handleBack = () => {
+        if (screen === "details") {
+            setScreen("upload");
+        } else if (screen === "review") {
+            setScreen("details");
+        } else if (screen === "results") {
+            setScreen("review");
+        }
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-[#252525]">
-            {screen === "upload" && (    
-                <Text className="mt-8 font-gotham text-[#DDD] text-[40px] text-center">Welcome to</Text>
+            {screen === "upload" ? (
+                <>
+                    <Text className="mt-8 font-gotham text-[#DDD] text-[40px] text-center">Welcome to</Text>
+                    <Text className="font-lexend text-[#DDD] text-[48px] text-center">MenuMatch</Text>
+                </>
+            ) : (
+                <View className="px-3 pt-2 pb-1">
+                    <View className="h-16 items-center justify-center">
+                        {showBack && (
+                            <View className="absolute left-3 top-0 bottom-0 justify-center">
+                                <Pressable className="h-16 w-10 items-center justify-center" onPress={handleBack}>
+                                    <Text className="text-[40px] leading-[40px] text-[#8AB4FF]">‹</Text>
+                                </Pressable>
+                            </View>
+                        )}
+                        <Text
+                            className={`font-lexend text-[#DDD] text-[40px] leading-[40px] text-center`}
+                        >
+                            {screenTitle[screen]}
+                        </Text>
+                    </View>
+                    {screen === "details" && (
+                        <Text className="mt-2 font-lexend font-light text-[#9BA6BA] text-[17px] text-center">
+                            Tell me where and when this meal was served.
+                        </Text>
+                    )}
+                </View>
             )}
-            <Text className="font-lexend text-[#DDD] text-[48px] text-center">MenuMatch</Text>
             {screen === "upload" ? (
                 <UploadStep onPickImage={pickImage} />
             ) : screen === "details" ? (

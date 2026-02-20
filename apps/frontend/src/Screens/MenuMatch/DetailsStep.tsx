@@ -42,11 +42,6 @@ export function DetailsStep({
       <View className="absolute -top-12 right-0 h-44 w-44 rounded-full bg-[#3F83F81C]" />
       <View className="absolute top-52 -left-16 h-56 w-56 rounded-full bg-[#34D39914]" />
 
-      <Text className="mt-2 font-lexend text-[34px] text-[#ECEFF5] text-center">Meal Details</Text>
-      <Text className="mt-3 font-lexend font-light text-[#9BA6BA] text-[17px] text-center">
-        Tell me where and when this meal was served.
-      </Text>
-
       <ScrollView className="mt-6" contentContainerStyle={{ paddingBottom: 22 }} showsVerticalScrollIndicator={false}>
         <View className="rounded-[20px] border border-[#5E7FB540] bg-[#161D29D8] px-4 py-4">
           <Text className="font-gotham text-[13px] tracking-[1px] text-[#A8B9D8]">DINING HALL</Text>
