@@ -26,14 +26,13 @@ export default function MenuMatch() {
     const [nutrition, setNutrition] = useState<NutritionFacts[]>([]);
 
     const pickImage = async () => {
-        // Ask for media library permissions
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
         if (status !== "granted") {
-            Alert.alert("Permission required", "We need access to your photos.");
+            Alert.alert("Permission required", "We need camera access to capture your meal.");
             return;
         }
 
-        const result = await ImagePicker.launchImageLibraryAsync({
+        const result = await ImagePicker.launchCameraAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: false,
             quality: 0.8,
