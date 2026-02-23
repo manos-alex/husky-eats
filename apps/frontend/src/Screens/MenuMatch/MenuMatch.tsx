@@ -166,7 +166,7 @@ export default function MenuMatch() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-[#252525]">
+        <SafeAreaView className="flex-1 bg-[#252525]" edges={["top", "left", "right"]}>
             {screen === "upload" ? (
                 <>
                     <Text className="mt-8 font-gotham text-[#DDD] text-[40px] text-center">Welcome to</Text>

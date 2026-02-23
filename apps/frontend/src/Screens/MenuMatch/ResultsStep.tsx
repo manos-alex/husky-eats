@@ -1,7 +1,7 @@
 import { ScrollView, Text, View } from "react-native";
 import { Circle } from "react-native-progress";
 import { NutritionFacts } from "../../api";
-import { cardColors, result } from "./constants";
+import { result } from "./constants";
 
 type Totals = {
   calories: number;
@@ -23,121 +23,114 @@ type ResultsStepProps = {
 };
 
 export function ResultsStep({ totals, nutrientCircles, nutrition }: ResultsStepProps) {
+  const formatMacro = (value: number) => `${value.toFixed(1)}g`;
+
   return (
-    <>
-      <Text className="mt-3 font-lexend font-light text-[#888] text-[20px] text-center">Here is the breakdown...</Text>
+    <View className="flex-1 px-3 pt-5 pb-8">
+      <View className="absolute -top-12 -right-14 h-56 w-56 rounded-full bg-[#2F82F82A]" />
+      <View className="absolute top-52 -left-20 h-72 w-72 rounded-full bg-[#34D39916]" />
+      <View className="absolute bottom-6 -right-20 h-80 w-80 rounded-full bg-[#A78BFA14]" />
 
-      <View className="self-center w-[100%]">
-        <Text className="mt-5 mx-5 font-lexend font-bold text-[42px] text-[#DDD]">
-          {totals.calories.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-          <Text className="font-lexend font-light text-[30px] text-[#DDD]"> calories</Text>
-        </Text>
-      </View>
+      <Text className="mt-2 font-lexend font-light text-[18px] text-center text-[#A7B8D6]">
+        Estimated from your plate and meal context.
+      </Text>
+      <Text className="mt-1 font-lexend font-light text-[12px] text-center text-[#8FA4C8]">
+        * Estimates may vary by preparation methods and serving size.
+      </Text>
 
-      <ScrollView className="mt-5">
-        <View className="flex-1 items-center">
-          <View className="my-3 w-full flex-row justify-around">
-            {nutrientCircles.map(({ key, total, dailyV }) => (
-              <View key={key}>
-                <View className="items-center justify-center">
-                  <Circle
-                    progress={total / dailyV}
-                    size={125}
-                    thickness={3}
-                    color="#2ECC71"
-                    unfilledColor="#555"
-                    borderWidth={0}
-                  />
-                  <View className="absolute items-center">
-                    <Text className="font-lexend text-[20px] text-[#DDD]">
-                      {total.toFixed(1)}
-                      <Text className="font-light text-[16px]"> g</Text>
-                    </Text>
-                    <Text className="mt-1 font-lexend text-[16px] text-[#DDD]">
-                      {" "}
-                      {((total / dailyV) * 100).toFixed(1)}% DV
-                    </Text>
+      <ScrollView className="mt-5 flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 28 }}>
+        <View className="rounded-[24px] border border-[#607EA744] bg-[#151C28E0] px-5 py-5">
+          <Text className="font-gotham text-[13px] tracking-[1.2px] text-[#9CB3D9]">TOTAL CALORIES</Text>
+          <Text className="mt-3 font-lexend text-[52px] leading-[52px] text-[#F3F8FF]">
+            {totals.calories.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+          </Text>
+          <Text className="mt-1 font-lexend text-[20px] text-[#BFD0EA]">kcal</Text>
+        </View>
+
+        <View className="mt-4 rounded-[24px] border border-[#607EA744] bg-[#151C28E0] px-4 py-4">
+          <Text className="font-gotham text-[13px] tracking-[1.2px] text-[#9CB3D9]">MACROS</Text>
+          <Text className="mt-1 font-lexend font-light text-[12px] text-[#8FA4C8]">• % Daily value</Text>
+          <View className="mt-3 flex-row justify-between">
+            {nutrientCircles.map(({ key, total, dailyV }) => {
+              const progress = Math.min(total / dailyV, 1);
+              const percent = (total / dailyV) * 100;
+              return (
+                <View key={key} className="w-[32%] rounded-[16px] border border-[#8CAAD830] bg-[#0D141F] px-2 py-3">
+                  <View className="items-center justify-center">
+                    <Circle
+                      progress={progress}
+                      size={88}
+                      thickness={6}
+                      color="#61A4FF"
+                      unfilledColor="#23344D"
+                      borderWidth={0}
+                    />
+                    <View className="absolute items-center">
+                      <Text className="font-lexend text-[12px] text-[#D9E8FF]">
+                        {percent.toFixed(0)}%
+                      </Text>
+                    </View>
                   </View>
+                  <Text className="mt-2 font-gotham text-[12px] tracking-[0.7px] text-center text-[#8FA7CD]">{key}</Text>
+                  <Text className="mt-1 font-lexend text-[16px] text-center text-[#E9F1FF]">{formatMacro(total)}</Text>
                 </View>
-                <Text className="mt-3 self-center font-lexend text-[16px] text-[#DDD]"> {key}</Text>
-              </View>
-            ))}
+              );
+            })}
           </View>
-          {result.map((item, index) => {
-            const nf = nutrition.find((n) => n.id === Number(item.id));
-            if (!nf) return null;
-            const palette = cardColors[index % cardColors.length];
+        </View>
 
-            return (
-              <View className="m-3 w-[98%] rounded-[10px] border-[3px] border-[#505050] bg-[#D0D0D0] py-4 flex" key={item.id}>
-                <Text className="font-lexend font-semibold text-[30px] text-[#454545] px-4">{item.name}</Text>
-                <View className="flex">
-                  <View className="mt-2 flex-row justify-around">
-                    <View
-                      className="w-[48%] h-16 border-[3px] rounded-[8px]"
-                      style={{ backgroundColor: palette.fill, borderColor: palette.stroke }}
-                    >
-                      <Text className="font-lexend font-light text-[16px] text-[#DDD] self-center">Serving Size</Text>
-                      <Text className="font-lexend font-bold text-[24px] text-[#DDD] self-center">{nf.servingsize}</Text>
+        <View className="mt-4 rounded-[24px] border border-[#607EA744] bg-[#151C28E0] px-4 py-4">
+          <Text className="font-gotham text-[13px] tracking-[1.2px] text-[#9CB3D9]">ITEM BREAKDOWN</Text>
+
+          <View className="mt-3 gap-3">
+            {result.map((item) => {
+              const nf = nutrition.find((n) => n.id === Number(item.id));
+              if (!nf) return null;
+
+              const calories = (nf.calories ?? 0) * item.servings;
+              const protein = (nf.protein_g ?? 0) * item.servings;
+              const carbs = (nf.totalcarbohydrate_g ?? 0) * item.servings;
+              const fat = (nf.totalfat_g ?? 0) * item.servings;
+
+              return (
+                <View key={item.id} className="rounded-[16px] border border-[#8CAAD830] bg-[#0D141F] px-4 py-4">
+                  <Text className="font-lexend text-[22px] leading-[27px] text-[#ECF3FF]">{item.name}</Text>
+
+                  <View className="mt-3 flex-row">
+                    <View className="mr-2 flex-1 rounded-[12px] border border-[#7B97BF33] bg-[#142033] px-3 py-2">
+                      <Text className="font-gotham text-[11px] tracking-[0.7px] text-[#8FA7CD]">SERVING SIZE</Text>
+                      <Text className="mt-1 font-lexend text-[15px] text-[#DCE9FF]">{nf.servingsize || "N/A"}</Text>
                     </View>
-                    <View
-                      className="w-[48%] h-16 border-[3px] rounded-[8px]"
-                      style={{ backgroundColor: palette.fill, borderColor: palette.stroke }}
-                    >
-                      <Text className="font-lexend font-light text-[16px] text-[#DDD] self-center">Servings</Text>
-                      <Text className="font-lexend font-bold text-[24px] text-[#DDD] self-center">{item.servings}</Text>
+                    <View className="ml-2 w-[96px] rounded-[12px] border border-[#7B97BF33] bg-[#142033] px-3 py-2">
+                      <Text className="font-gotham text-[11px] tracking-[0.7px] text-[#8FA7CD]">SERVINGS</Text>
+                      <Text className="mt-1 font-lexend text-[15px] text-[#DCE9FF]">{item.servings.toFixed(2)}</Text>
                     </View>
                   </View>
 
-                  <View className="my-2 w-[95%] h-[2px] self-center" style={{ backgroundColor: palette.stroke }} />
-
-                  <View className="flex-row justify-around">
-                    <View
-                      className="w-[24%] h-[100%] border-[3px] rounded-[8px]"
-                      style={{ backgroundColor: palette.fill, borderColor: palette.stroke }}
-                    >
-                      <Text className="font-lexend font-light text-[16px] text-[#DDD] self-center">Calories</Text>
-                      <Text className="font-lexend font-bold text-[24px] text-[#DDD] self-center">
-                        {((nf.calories ?? 0) * item.servings).toFixed(0)}
-                      </Text>
+                  <View className="mt-3 flex-row flex-wrap justify-between">
+                    <View className="mb-2 w-[48.5%] rounded-[12px] border border-[#7B97BF33] bg-[#111C2D] px-3 py-2">
+                      <Text className="font-gotham text-[11px] tracking-[0.7px] text-[#8FA7CD]">CALORIES</Text>
+                      <Text className="mt-1 font-lexend text-[17px] text-[#E9F1FF]">{calories.toFixed(0)} kcal</Text>
                     </View>
-                    <View
-                      className="w-[24%] h-[100%] border-[3px] rounded-[8px]"
-                      style={{ backgroundColor: palette.fill, borderColor: palette.stroke }}
-                    >
-                      <Text className="font-lexend font-light text-[16px] text-[#DDD] self-center">Protein</Text>
-                      <Text className="font-lexend font-bold text-[24px] text-[#DDD] self-center">
-                        {((nf.protein_g ?? 0) * item.servings).toFixed(1)}
-                        <Text className="font-light text-[20px]">g</Text>
-                      </Text>
+                    <View className="mb-2 w-[48.5%] rounded-[12px] border border-[#7B97BF33] bg-[#111C2D] px-3 py-2">
+                      <Text className="font-gotham text-[11px] tracking-[0.7px] text-[#8FA7CD]">PROTEIN</Text>
+                      <Text className="mt-1 font-lexend text-[17px] text-[#E9F1FF]">{formatMacro(protein)}</Text>
                     </View>
-                    <View
-                      className="w-[24%] h-[100%] border-[3px] rounded-[8px]"
-                      style={{ backgroundColor: palette.fill, borderColor: palette.stroke }}
-                    >
-                      <Text className="font-lexend font-light text-[16px] text-[#DDD] self-center">Carbs</Text>
-                      <Text className="font-lexend font-bold text-[24px] text-[#DDD] self-center">
-                        {((nf.totalcarbohydrate_g ?? 0) * item.servings).toFixed(1)}
-                        <Text className="font-light text-[20px]">g</Text>
-                      </Text>
+                    <View className="w-[48.5%] rounded-[12px] border border-[#7B97BF33] bg-[#111C2D] px-3 py-2">
+                      <Text className="font-gotham text-[11px] tracking-[0.7px] text-[#8FA7CD]">CARBS</Text>
+                      <Text className="mt-1 font-lexend text-[17px] text-[#E9F1FF]">{formatMacro(carbs)}</Text>
                     </View>
-                    <View
-                      className="w-[24%] h-[100%] border-[3px] rounded-[8px]"
-                      style={{ backgroundColor: palette.fill, borderColor: palette.stroke }}
-                    >
-                      <Text className="font-lexend font-light text-[16px] text-[#DDD] self-center">Fat</Text>
-                      <Text className="font-lexend font-bold text-[24px] text-[#DDD] self-center">
-                        {((nf.totalfat_g ?? 0) * item.servings).toFixed(1)}
-                        <Text className="font-light text-[20px]">g</Text>
-                      </Text>
+                    <View className="w-[48.5%] rounded-[12px] border border-[#7B97BF33] bg-[#111C2D] px-3 py-2">
+                      <Text className="font-gotham text-[11px] tracking-[0.7px] text-[#8FA7CD]">FAT</Text>
+                      <Text className="mt-1 font-lexend text-[17px] text-[#E9F1FF]">{formatMacro(fat)}</Text>
                     </View>
                   </View>
                 </View>
-              </View>
-            );
-          })}
+              );
+            })}
+          </View>
         </View>
       </ScrollView>
-    </>
+    </View>
   );
 }
