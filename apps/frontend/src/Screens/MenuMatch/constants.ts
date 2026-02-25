@@ -11,6 +11,13 @@ export const halls: Record<number, string> = {
   42: "Towers",
 };
 
+export const DailyValue = {
+  calories: 2000,
+  protein: 50,
+  carbs: 275,
+  fat: 78,
+};
+
 export const result: ItemMatch[] = [
   { name: "Fried Chicken Nuggets", id: "111037", servings: 2 },
   { name: "Cross Trax French Fries", id: "161069", servings: 0.75 },

@@ -28,6 +28,14 @@ const config: ExpoConfig = {
         favicon: "./src/assets/favicon.png",
         bundler: "metro",
     },
+    plugins: [
+        [
+            "expo-camera",
+            {
+                cameraPermission: "Allow Husky Eats to access your camera so you can photograph your plate."
+            }
+        ]
+    ],
     extra: {
         API_BASEURL: process.env.API_BASEURL,
     }

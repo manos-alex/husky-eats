@@ -30,7 +30,12 @@ export function ReviewStep({ image, hall, meal, date, onEdit, onCalculate }: Rev
           <Text className="font-gotham text-[13px] tracking-[1.5px] text-[#9CB3D9]">YOUR PHOTO</Text>
           <View className="mt-3 h-64 rounded-[18px] border border-[#8CAAD830] bg-[#0D141F] items-center justify-center overflow-hidden px-3 py-3">
             {image ? (
-              <Image source={{ uri: image }} className="h-full w-full rounded-[12px]" resizeMode="contain" />
+              <Image
+                source={{ uri: image }}
+                className="h-full w-full rounded-[12px]"
+                resizeMode="contain"
+                style={{ transform: [{ scale: 2.5 }] }}
+              />
             ) : (
               <Text className="font-lexend text-[16px] text-[#93A6C7]">No photo selected</Text>
             )}

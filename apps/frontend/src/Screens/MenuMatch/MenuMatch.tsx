@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as ImagePicker from "expo-image-picker";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import { getNutritionFacts, ItemMatch, NutritionFacts } from "../../api";
 import { DailyValue, result } from "./constants";
+import { CameraCaptureStep } from "./CameraCaptureStep";
 import { DetailsStep } from "./DetailsStep";
 import { LoadingStep } from "./LoadingStep";
 import { ResultsStep } from "./ResultsStep";
@@ -11,7 +12,7 @@ import { ReviewStep } from "./ReviewStep";
 import { UploadStep } from "./UploadStep";
 import "../../../global.css";
 
-type MenuMatchScreen = "upload" | "details" | "review" | "loading" | "results";
+type MenuMatchScreen = "upload" | "camera" | "details" | "review" | "loading" | "results";
 
 export default function MenuMatch() {
     const [screen, setScreen] = useState<MenuMatchScreen>("upload");
@@ -21,28 +22,41 @@ export default function MenuMatch() {
     const [date, setDate] = useState<Date>(new Date());
 
     const [image, setImage] = useState<string | null>(null);
+    const [cameraPermission, requestCameraPermission] = useCameraPermissions();
+    const [capturingPhoto, setCapturingPhoto] = useState(false);
+    const cameraRef = useRef<CameraView>(null);
 
     // const [result, setResult] = useState<ItemMatch[]>([]);
     const [nutrition, setNutrition] = useState<NutritionFacts[]>([]);
 
     const pickImage = async () => {
-        const { status } = await ImagePicker.requestCameraPermissionsAsync();
-        if (status !== "granted") {
-            Alert.alert("Permission required", "We need camera access to capture your meal.");
+        if (!cameraPermission?.granted) {
+            const result = await requestCameraPermission();
+            if (!result.granted) {
+                Alert.alert("Permission required", "We need camera access to capture your meal.");
+                return;
+            }
+        }
+        setScreen("camera");
+    };
+
+    const captureImage = async () => {
+        if (!cameraRef.current || capturingPhoto) {
             return;
         }
-
-        const result = await ImagePicker.launchCameraAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: false,
-            quality: 0.8,
-        });
-
-        if (!result.canceled) {
-            // In SDK 49+ the assets array is used
-            const uri = result.assets[0].uri;
-            setImage(uri);
-            setScreen("details");
+        setCapturingPhoto(true);
+        try {
+            const photo = await cameraRef.current.takePictureAsync({
+                quality: 0.8,
+            });
+            if (photo?.uri) {
+                setImage(photo.uri);
+                setScreen("details");
+            }
+        } catch {
+            Alert.alert("Camera error", "We could not capture your photo. Please try again.");
+        } finally {
+            setCapturingPhoto(false);
         }
     };
 
@@ -145,8 +159,7 @@ export default function MenuMatch() {
         {key: "Fat", total: totals.fat, dailyV: DailyValue.fat},
     ];
 
-    const screenTitle: Record<MenuMatchScreen, string> = {
-        upload: "MenuMatch",
+    const screenTitle: Record<Exclude<MenuMatchScreen, "upload" | "camera">, string> = {
         details: "Meal Details",
         review: "Review Meal",
         loading: "Calculating",
@@ -172,7 +185,7 @@ export default function MenuMatch() {
                     <Text className="mt-8 font-gotham text-[#DDD] text-[40px] text-center">Welcome to</Text>
                     <Text className="font-lexend text-[#DDD] text-[48px] text-center">MenuMatch</Text>
                 </>
-            ) : (
+            ) : screen === "camera" ? null : (
                 <View className="px-3 pt-2 pb-1">
                     <View className="h-16 items-center justify-center">
                         {showBack && (
@@ -197,6 +210,13 @@ export default function MenuMatch() {
             )}
             {screen === "upload" ? (
                 <UploadStep onPickImage={pickImage} />
+            ) : screen === "camera" ? (
+                <CameraCaptureStep
+                    cameraRef={cameraRef}
+                    onCancel={() => setScreen("upload")}
+                    onCapture={captureImage}
+                    isCapturing={capturingPhoto}
+                />
             ) : screen === "details" ? (
                 <DetailsStep
                     hall={hall}
