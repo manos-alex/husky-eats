@@ -1,4 +1,4 @@
-import { Image, Pressable, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { halls } from "./constants";
 import { formatDate } from "./utils";
 
@@ -12,40 +12,70 @@ type ReviewStepProps = {
 };
 
 export function ReviewStep({ image, hall, meal, date, onEdit, onCalculate }: ReviewStepProps) {
+  const hallLabel = hall ? halls[hall] : "Not selected";
+  const mealLabel = meal ? meal.charAt(0).toUpperCase() + meal.slice(1) : "Not selected";
+
   return (
-    <>
-      <Text className="mt-10 font-lexend font-light text-[#888] text-[20px] text-center">
-        Please review your meal details...
+    <View className="flex-1 px-5 pt-5 pb-8">
+      <View className="absolute -top-12 -right-12 h-52 w-52 rounded-full bg-[#2F82F830]" />
+      <View className="absolute top-64 -left-16 h-60 w-60 rounded-full bg-[#34D3991A]" />
+      <View className="absolute bottom-12 -right-20 h-72 w-72 rounded-full bg-[#A78BFA12]" />
+
+      <Text className="mt-2 font-lexend font-light text-[18px] text-center text-[#A7B8D6]">
+        Confirm meal details before calculating nutrition.
       </Text>
 
-      <View className="mt-10 flex-1 items-center">
-        {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} resizeMode="contain" />}
-        <View className="mt-10 flex-row w-[85%] justify-center">
-          <View className="mx-5">
-            <Text className="font-gotham text-[20px] text-[#DDD]">Hall</Text>
-            <Text className="font-lexend text-[32px] text-[#DDD]">{hall && halls[hall]}</Text>
+      <ScrollView className="mt-5 flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
+        <View className="rounded-[24px] border border-[#607EA744] bg-[#151C28E0] px-4 py-4">
+          <Text className="font-gotham text-[13px] tracking-[1.5px] text-[#9CB3D9]">YOUR PHOTO</Text>
+          <View className="mt-3 h-64 rounded-[18px] border border-[#8CAAD830] bg-[#0D141F] items-center justify-center overflow-hidden px-3 py-3">
+            {image ? (
+              <Image
+                source={{ uri: image }}
+                className="h-full w-full rounded-[12px]"
+                resizeMode="contain"
+                style={{ transform: [{ scale: 2.5 }] }}
+              />
+            ) : (
+              <Text className="font-lexend text-[16px] text-[#93A6C7]">No photo selected</Text>
+            )}
           </View>
-          <View className="mx-5">
-            <Text className="font-gotham text-[20px] text-[#DDD]">Meal</Text>
-            <Text className="font-lexend text-[32px] text-[#DDD]">
-              {meal === "breakfast" ? "Breakfast" : meal === "lunch" ? "Lunch" : "Dinner"}
-            </Text>
-          </View>
-        </View>
-        <View className="mt-10">
-          <Text className="font-gotham text-[20px] text-[#DDD]">Date</Text>
-          <Text className="font-lexend text-[32px] text-[#DDD]">{formatDate(date)}</Text>
         </View>
 
-        <View className="flex-row w-[70%] justify-between">
-          <Pressable className="mt-20 bg-[#33373d] p-3 w-auto rounded-[5px] self-center" onPress={onEdit}>
-            <Text className="font-gotham font-bold text-[24px] text-[#deebff] text-center">Edit</Text>
-          </Pressable>
-          <Pressable className="mt-20 bg-[#2071f5] p-3 w-auto rounded-[5px] self-center" onPress={onCalculate}>
-            <Text className="font-lexend font-bold text-[32px] text-[#deebff] text-center">Calculate</Text>
-          </Pressable>
+        <View className="mt-4 rounded-[24px] border border-[#607EA744] bg-[#151C28E0] px-4 py-4">
+          <Text className="font-gotham text-[13px] tracking-[1.5px] text-[#9CB3D9]">MEAL CONTEXT</Text>
+
+          <View className="mt-3 rounded-[14px] border border-[#8CAAD830] bg-[#0D141F] px-4 py-3">
+            <Text className="font-gotham text-[12px] tracking-[1px] text-[#8FA7CD]">DINING HALL</Text>
+            <Text className="mt-1 font-lexend text-[24px] text-[#E9F1FF]">{hallLabel}</Text>
+          </View>
+
+          <View className="mt-3 rounded-[14px] border border-[#8CAAD830] bg-[#0D141F] px-4 py-3">
+            <Text className="font-gotham text-[12px] tracking-[1px] text-[#8FA7CD]">MEAL TIME</Text>
+            <Text className="mt-1 font-lexend text-[24px] text-[#E9F1FF]">{mealLabel}</Text>
+          </View>
+
+          <View className="mt-3 rounded-[14px] border border-[#8CAAD830] bg-[#0D141F] px-4 py-3">
+            <Text className="font-gotham text-[12px] tracking-[1px] text-[#8FA7CD]">DATE</Text>
+            <Text className="mt-1 font-lexend text-[24px] text-[#E9F1FF]">{formatDate(date)}</Text>
+          </View>
         </View>
+      </ScrollView>
+
+      <View className="mt-auto flex-row gap-3">
+        <Pressable
+          className="h-14 flex-1 rounded-[14px] border border-[#8CAAD844] bg-[#111A27] justify-center"
+          onPress={onEdit}
+        >
+          <Text className="font-lexend text-[18px] text-center text-[#D5E4FC]">Edit</Text>
+        </Pressable>
+        <Pressable
+          className="h-14 flex-[1.2] rounded-[14px] border border-[#BFD8FF70] bg-[#2F82F8] justify-center"
+          onPress={onCalculate}
+        >
+          <Text className="font-lexend font-semibold text-[20px] text-center text-[#ECF4FF]">Calculate</Text>
+        </Pressable>
       </View>
-    </>
+    </View>
   );
 }
