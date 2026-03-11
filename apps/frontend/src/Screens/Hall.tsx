@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Text, View, ScrollView, Pressable } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, Text, View, ScrollView, Pressable, Easing, PanResponder } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getMenuItems, MenuItem } from '../api';
+import { StatusBar } from 'expo-status-bar';
+import { getMenuItems, getNutritionFacts, MenuItem, NutritionFacts } from '../api';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import "../../global.css";
@@ -17,13 +18,16 @@ export default function Hall({route}: any) {
     const [lunchItems, setLunchItems] = useState<MenuItem[]>([]);
     const [dinnerItems, setDinnerItems] = useState<MenuItem[]>([]);
     const [displayItems, setDisplayItems] = useState<MenuItem[]>([]);
+    const [nutritionById, setNutritionById] = useState<Record<number, NutritionFacts>>({});
+    const [tabBarWidth, setTabBarWidth] = useState(0);
 
-    const [curMeal, setCurMeal] = useState(() => (meal !== "Closed" ? meal : "Breakfast"));
+    const [curMeal, setCurMeal] = useState(() => normalizeMeal(meal));
 
     const [loading, setLoading] = useState(true);
-
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
+    const tabAnimation = useRef(new Animated.Value(getMealIndex(normalizeMeal(meal)))).current;
+    const isDraggingTab = useRef(false);
+    const mealOrder = useMemo(() => ["Breakfast", "Lunch", "Dinner"], []);
 
     useEffect(() => {
         async function load() {
@@ -37,84 +41,350 @@ export default function Hall({route}: any) {
                 setBreakfastItems(breakfastItemsRes);
                 setLunchItems(lunchItemsRes);
                 setDinnerItems(dinnerItemsRes);
-
-                if (curMeal === "Breakfast") setDisplayItems(breakfastItemsRes);
-                else if (curMeal === "Lunch") setDisplayItems(lunchItemsRes);
-                else if (curMeal === "Dinner") setDisplayItems(dinnerItemsRes);
+            } catch (err) {
+                console.log(err);
+            } finally {
                 setLoading(false);
+            }
+        }
+
+        load();
+    }, [hall.id])
+
+    useEffect(() => {
+        if (curMeal === "Breakfast") {
+            setDisplayItems(breakfastItems);
+        } else if (curMeal === "Lunch") {
+            setDisplayItems(lunchItems);
+        } else {
+            setDisplayItems(dinnerItems);
+        }
+    }, [breakfastItems, lunchItems, dinnerItems, curMeal]);
+
+    useEffect(() => {
+        if (isDraggingTab.current) {
+            return;
+        }
+
+        Animated.timing(tabAnimation, {
+            toValue: getMealIndex(curMeal),
+            duration: 220,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+        }).start();
+    }, [curMeal, tabAnimation]);
+
+    useEffect(() => {
+        async function loadNutrition() {
+            const missingIds = displayItems
+                .map((item) => item.id)
+                .filter((id) => nutritionById[id] === undefined);
+
+            if (!missingIds.length) {
+                return;
+            }
+
+            try {
+                const nutritionResults = await Promise.all(
+                    missingIds.map((id) => getNutritionFacts({ id }))
+                );
+
+                setNutritionById((current) => {
+                    const next = { ...current };
+                    nutritionResults.forEach((nutrition) => {
+                        next[nutrition.id] = nutrition;
+                    });
+                    return next;
+                });
             } catch (err) {
                 console.log(err);
             }
         }
 
-        load();
-    }, [])
+        loadNutrition();
+    }, [displayItems, nutritionById]);
 
-    const changeMeal = (meal: String) => {
-        if (meal === "Breakfast") {
-            setDisplayItems(breakfastItems);
-            setCurMeal("Breakfast");    
+    const snapTabPill = (index: number) => {
+        Animated.timing(tabAnimation, {
+            toValue: index,
+            duration: 220,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+        }).start();
+    };
+
+    const animateMealChange = (nextMeal: string) => {
+        if (nextMeal === curMeal) {
+            snapTabPill(getMealIndex(nextMeal));
+            return;
         }
-        if (meal === "Lunch") {
-            setDisplayItems(lunchItems);
-            setCurMeal("Lunch");
+
+        setCurMeal(nextMeal);
+        snapTabPill(getMealIndex(nextMeal));
+    };
+
+    const changeMeal = (meal: string) => {
+        animateMealChange(meal);
+    };
+
+    const switchMealByOffset = (offset: number) => {
+        const currentIndex = mealOrder.indexOf(curMeal);
+        const nextIndex = currentIndex + offset;
+
+        if (nextIndex < 0 || nextIndex >= mealOrder.length) {
+            return;
         }
-        if (meal === "Dinner") {
-            setDisplayItems(dinnerItems);
-            setCurMeal("Dinner");
-        }
-    }
+
+        animateMealChange(mealOrder[nextIndex]);
+    };
+
+    const panResponder = useMemo(() => PanResponder.create({
+        onMoveShouldSetPanResponder: (_, gestureState) => {
+            return Math.abs(gestureState.dx) > 24 && Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.5;
+        },
+        onPanResponderGrant: () => {
+            isDraggingTab.current = true;
+            tabAnimation.stopAnimation();
+        },
+        onPanResponderMove: (_, gestureState) => {
+            const currentIndex = getMealIndex(curMeal);
+            const dragProgress = Math.max(-1, Math.min(1, gestureState.dx / -120));
+            const nextValue = Math.max(0, Math.min(2, currentIndex + dragProgress));
+            tabAnimation.setValue(nextValue);
+        },
+        onPanResponderRelease: (_, gestureState) => {
+            if (gestureState.dx <= -48) {
+                switchMealByOffset(1);
+            } else if (gestureState.dx >= 48) {
+                switchMealByOffset(-1);
+            } else {
+                snapTabPill(getMealIndex(curMeal));
+            }
+            isDraggingTab.current = false;
+        },
+        onPanResponderTerminate: () => {
+            isDraggingTab.current = false;
+            snapTabPill(getMealIndex(curMeal));
+        },
+    }), [curMeal, mealOrder, tabAnimation]);
+
+    const groupedItems = useMemo(() => {
+        return [...new Set(displayItems.map(item => item.station))].map((station) => ({
+            station,
+            items: displayItems.filter((item) => item.station === station),
+        }));
+    }, [displayItems]);
 
     return (
-        <SafeAreaView className="flex-1 bg-[#252525]">
-            <View className="items-center">
-                <View className='flex-row w-full justify-around items-center'>
-                    <Pressable onPress={() => navigation.goBack()}>
-                        <Text className='font-lexend text-[32px] text-white p-5'>{'<'}</Text>
+        <SafeAreaView
+            className="flex-1 bg-[#232323]"
+            edges={["top", "left", "right"]}
+            {...panResponder.panHandlers}
+        >
+            <StatusBar style="light" />
+
+            <View className="px-5 pt-3 pb-3">
+                <View className="flex-row items-center justify-between">
+                    <Pressable
+                        className="rounded-full border border-[#202020] bg-[#171717] px-4 py-3"
+                        onPress={() => navigation.goBack()}
+                    >
+                        <Text className="font-lexend text-[18px] leading-[18px] text-[#D8D8D8]">Back</Text>
                     </Pressable>
-                    <Text className="font-gotham mt-2 text-[36px] text-[#DDD]" >{hall.name}</Text>
-                    <Pressable onPress={() => navigation.goBack()}>
-                        <Text className='font-lexend text-[32px] text-white p-5'></Text>
-                    </Pressable>
+                    <Text className="mx-4 flex-1 text-center font-gotham text-[34px] text-[#E2E2E2]">
+                        {hall.name}
+                    </Text>
+                    <View className="w-[74px]" />
                 </View>
-                <View className="flex-row items-center mt-2" >
-                    <Pressable className={`px-4 py-2 flex-1 ${curMeal === "Breakfast" ? "border-b-4 border-blue-900" : ""}`} onPress={() => changeMeal("Breakfast")} >
-                        <Text className="font-lexend text-[#DDD] text-center text-[20px]" >Breakfast</Text>
-                    </Pressable>
-                    <Pressable className={`px-4 py-2 flex-1 ${curMeal === "Lunch" ? "border-b-4 border-blue-900" : ""}`} onPress={() => changeMeal("Lunch")} >
-                        <Text className="font-lexend text-[#DDD] text-center text-[20px]" >Lunch</Text>
-                    </Pressable>
-                    <Pressable className={`px-4 py-2 flex-1 ${curMeal === "Dinner" ? "border-b-4 border-blue-900" : ""}`} onPress={() => changeMeal("Dinner")}>
-                        <Text className="font-lexend text-[#DDD] text-center text-[20px]" >Dinner</Text>
-                    </Pressable>
+
+                <View className="mt-5 rounded-[24px] border border-[#1C1C1C] bg-[#161616] p-2">
+                    <View
+                        className="relative flex-row"
+                        onLayout={(event) => setTabBarWidth(event.nativeEvent.layout.width)}
+                    >
+                        <Animated.View
+                            className="absolute bottom-0 left-0 top-0 rounded-[18px] bg-[#1A2740]"
+                            style={{
+                                width: tabBarWidth ? tabBarWidth / 3 : 0,
+                                transform: [
+                                    {
+                                        translateX: tabAnimation.interpolate({
+                                            inputRange: [0, 1, 2],
+                                            outputRange: tabBarWidth
+                                                ? [0, tabBarWidth / 3, (tabBarWidth / 3) * 2]
+                                                : [0, 0, 0],
+                                        }),
+                                    },
+                                ],
+                            }}
+                        />
+                        <MealTab label="Breakfast" onPress={() => changeMeal("Breakfast")} />
+                        <MealTab label="Lunch" onPress={() => changeMeal("Lunch")} />
+                        <MealTab label="Dinner" onPress={() => changeMeal("Dinner")} />
+                    </View>
                 </View>
             </View>
-            <ScrollView className="flex-1 bg-[#2e2e2e]">
-                <View className="flex-1 justify-center">
-                    {!loading ?
-                        <View className="flex-1">
-                        {[...new Set(displayItems.map(item => item.station))].map(station => (
-                            <View key={station}>
-                                <Text className="font-lexend text-[28px] text-[#FFF] bg-[#38425A] px-4 py-2">{station}</Text>
-                                {displayItems.filter(item => item.station === station).map((menuItem, index, arr) => (
-                                    <View key={index}>
-                                        <Pressable
-                                            key={index}
-                                            onPress={() => navigation.navigate("Nutrition", {id: menuItem.id, name: menuItem.name})}>
-                                            <Text className="font-lexend font-light text-[24px] text-[#DDD] px-8 py-6">{menuItem.name}</Text>
-                                        </Pressable>
-                                        {index !== arr.length - 1 && (
-                                            <View className="w-[90%] h-0.5 bg-[#4A4A4A] self-center" />
-                                        )}
-                                    </View>
-                                ))}
+
+            <ScrollView
+                className="flex-1"
+                contentContainerStyle={{ paddingHorizontal: 6, paddingTop: 12, paddingBottom: 28 }}
+            >
+                {loading ? (
+                    <View className="rounded-[28px] border border-[#1E1E1E] bg-[#171717] px-5 py-6">
+                        <Text className="font-lexend text-[22px] text-[#E2E2E2]">Loading menu...</Text>
+                        <Text className="mt-2 font-lexend font-light text-[15px] text-[#A8A8A8]">
+                            Pulling today's items for {hall.name}.
+                        </Text>
+                    </View>
+                ) : groupedItems.length ? (
+                    groupedItems.map(({ station, items }) => {
+                        const stationAccent = getStationAccent(station);
+
+                        return (
+                        <View className="mb-5 w-full self-center overflow-hidden rounded-[30px] border border-[#1A1A1A] bg-[#151515]" key={station}>
+                            <View
+                                className="border-b border-[#202020] px-5 py-4"
+                                style={{ backgroundColor: stationAccent.headerBg }}
+                            >
+                                <Text
+                                    className="font-lexend text-[28px]"
+                                    style={{ color: stationAccent.headerText }}
+                                >
+                                    {station}
+                                </Text>
                             </View>
-                        ))}
+
+                            {items.map((menuItem, index) => (
+                                <View key={menuItem.id}>
+                                    <Pressable
+                                        className="px-6 py-5"
+                                        onPress={() => navigation.navigate("Nutrition", {id: menuItem.id, name: menuItem.name})}
+                                    >
+                                        <View>
+                                            <Text className="font-lexend font-light text-[23px] leading-[30px] text-[#D7D7D7]">
+                                                {menuItem.name}
+                                            </Text>
+                                            <Text
+                                                className="mt-2 font-lexend text-[14px]"
+                                                style={{ color: stationAccent.subtleText }}
+                                            >
+                                                {formatAllergens(nutritionById[menuItem.id]?.allergens)}
+                                            </Text>
+                                        </View>
+                                    </Pressable>
+
+                                    {index !== items.length - 1 && (
+                                        <View className="mx-6 h-px bg-[#272727]" />
+                                    )}
+                                </View>
+                            ))}
                         </View>
-                        : <Text className="text-[#DDD]" >loading...</Text>
-                    }
-                </View>
+                        );
+                    })
+                ) : (
+                    <View className="rounded-[28px] border border-[#1E1E1E] bg-[#171717] px-5 py-6">
+                        <Text className="font-lexend text-[22px] text-[#E2E2E2]">No items found</Text>
+                        <Text className="mt-2 font-lexend font-light text-[15px] text-[#A8A8A8]">
+                            There are no menu items listed for {curMeal.toLowerCase()} right now.
+                        </Text>
+                    </View>
+                )}
             </ScrollView>
         </SafeAreaView>
     )
+}
+
+function MealTab({
+    label,
+    onPress,
+}: {
+    label: string;
+    onPress: () => void;
+}) {
+    return (
+        <Pressable
+            className="z-10 flex-1 rounded-[18px] px-3 py-3"
+            onPress={onPress}
+        >
+            <Text className="text-center font-lexend text-[18px] text-[#D4D8E0]">
+                {label}
+            </Text>
+        </Pressable>
+    );
+}
+
+function normalizeMeal(meal: string) {
+    if (meal === "Lunch" || meal === "Dinner" || meal === "Breakfast") {
+        return meal;
+    }
+
+    if (meal === "Brunch") {
+        return "Lunch";
+    }
+
+    return "Breakfast";
+}
+
+function getMealIndex(meal: string) {
+    if (meal === "Lunch") return 1;
+    if (meal === "Dinner") return 2;
+    return 0;
+}
+
+function formatAllergens(allergens?: string) {
+    if (!allergens || allergens.trim() === "") {
+        return "No allergens listed";
+    }
+
+    return `Allergens: ${allergens}`;
+}
+
+function getStationAccent(station: string) {
+    const normalized = station.toLowerCase();
+
+    if (normalized.includes("grill") || normalized.includes("fire")) {
+        return {
+            headerBg: "#211816",
+            headerText: "#E6B09A",
+            subtleText: "#C2917E",
+        };
+    }
+
+    if (normalized.includes("salad") || normalized.includes("garden") || normalized.includes("veggie")) {
+        return {
+            headerBg: "#162019",
+            headerText: "#A8D3AE",
+            subtleText: "#7FB287",
+        };
+    }
+
+    if (normalized.includes("pizza") || normalized.includes("pasta") || normalized.includes("ital")) {
+        return {
+            headerBg: "#231A18",
+            headerText: "#E4B49A",
+            subtleText: "#C58D78",
+        };
+    }
+
+    if (normalized.includes("dessert") || normalized.includes("bakery") || normalized.includes("sweet")) {
+        return {
+            headerBg: "#201823",
+            headerText: "#D8B1E8",
+            subtleText: "#B98CCB",
+        };
+    }
+
+    if (normalized.includes("deli") || normalized.includes("sandwich")) {
+        return {
+            headerBg: "#1A1E24",
+            headerText: "#AFC8E8",
+            subtleText: "#86A6CF",
+        };
+    }
+
+    return {
+        headerBg: "#171D27",
+        headerText: "#AFC8E8",
+        subtleText: "#86A6CF",
+    };
 }
