@@ -15,7 +15,7 @@ import "../../../global.css";
 
 type MenuMatchScreen = "upload" | "camera" | "details" | "review" | "loading" | "results";
 
-const predictApiUrl = Constants.expoConfig?.extra?.PREDICT_API_URL as string | undefined;
+const PREDICT_API_URL = Constants.expoConfig?.extra?.PREDICT_API_URL as string | undefined;
 
 export default function MenuMatch({ navigation }: any) {
     const [screen, setScreen] = useState<MenuMatchScreen>("upload");
@@ -86,7 +86,7 @@ export default function MenuMatch({ navigation }: any) {
             if (!image || !hall || !meal) {
                 return [];
             }
-            if (!predictApiUrl) {
+            if (!PREDICT_API_URL) {
                 throw new Error("PREDICT_API_URL is not configured.");
             }
 
@@ -100,7 +100,7 @@ export default function MenuMatch({ navigation }: any) {
             formData.append("meal", meal);
             formData.append("date", formatPredictDate(date));
 
-            const res = await fetch(predictApiUrl, {
+            const res = await fetch(PREDICT_API_URL, {
                 method: "POST",
                 body: formData,
             });
