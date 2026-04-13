@@ -2,8 +2,9 @@ import { useMemo, useRef, useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CameraView, useCameraPermissions } from "expo-camera";
+import Constants from "expo-constants";
 import { getNutritionFacts, ItemMatch, NutritionFacts } from "../../api";
-import { DailyValue, result } from "./constants";
+import { DailyValue } from "./constants";
 import { CameraCaptureStep } from "./CameraCaptureStep";
 import { DetailsStep } from "./DetailsStep";
 import { LoadingStep } from "./LoadingStep";
@@ -13,6 +14,8 @@ import { UploadStep } from "./UploadStep";
 import "../../../global.css";
 
 type MenuMatchScreen = "upload" | "camera" | "details" | "review" | "loading" | "results";
+
+const predictApiUrl = Constants.expoConfig?.extra?.PREDICT_API_URL as string | undefined;
 
 export default function MenuMatch({ navigation }: any) {
     const [screen, setScreen] = useState<MenuMatchScreen>("upload");
@@ -26,7 +29,7 @@ export default function MenuMatch({ navigation }: any) {
     const [capturingPhoto, setCapturingPhoto] = useState(false);
     const cameraRef = useRef<CameraView>(null);
 
-    // const [result, setResult] = useState<ItemMatch[]>([]);
+    const [result, setResult] = useState<ItemMatch[]>([]);
     const [nutrition, setNutrition] = useState<NutritionFacts[]>([]);
 
     const pickImage = async () => {
@@ -79,6 +82,44 @@ export default function MenuMatch({ navigation }: any) {
     };
 
     const predict = async () => {
+        try {
+            if (!image || !hall || !meal) {
+                return [];
+            }
+            if (!predictApiUrl) {
+                throw new Error("PREDICT_API_URL is not configured.");
+            }
+
+            const formData = new FormData();
+            formData.append("image", {
+                uri: image,
+                name: "plate.jpg",
+                type: "image/jpeg",
+            } as unknown as Blob);
+            formData.append("dining_hall_id", String(hall));
+            formData.append("meal", meal);
+            formData.append("date", formatPredictDate(date));
+
+            const res = await fetch(predictApiUrl, {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!res.ok) {
+                throw new Error(`Predict request failed with status ${res.status}`);
+            }
+
+            const data = await res.json();
+            const items = (Array.isArray(data) ? data : data.items ?? []) as ItemMatch[];
+
+            setResult(items);
+            return items;
+        } catch (err) {
+            console.error("Failed to predict items and servings.", err);
+            return [];
+        }
+
+        // Previous path/query implementation kept for reference.
         // try {
         //     if (image) {
         //         const img = await fetch(image);
@@ -101,19 +142,12 @@ export default function MenuMatch({ navigation }: any) {
         //     console.error("Failed to predict items and servings.", err);
         // }
 
-        const result: ItemMatch[] = [
-            {name: "Cross Trax French Fries", id: "161069", servings: 0.75},
-            {name: "Fried Chicken Nuggets", id: "111037", servings: 2},
-            {name: "Corn", id: "171012", servings: 1},
-        ]
-
-        return result;
     };
 
-    const fetchNutrition = async () => {
+    const fetchNutrition = async (items: ItemMatch[]) => {
         try {
             const nf = await Promise.all(
-                result.map((item) => getNutritionFacts({ id: Number(item.id) }))
+                items.map((item) => getNutritionFacts({ id: Number(item.id) }))
             );
             setNutrition(nf);
         } catch (err) {
@@ -121,17 +155,16 @@ export default function MenuMatch({ navigation }: any) {
         }
     };
 
-    const loadResults = () => {
+    const loadResults = async () => {
         setScreen("loading");
-        setTimeout(() => {
-            handleCalculate();
-        }, 7000);
+        await handleCalculate();
     };
 
     const handleCalculate = async () => {
+        setNutrition([]);
         const items = await predict();
         if (items.length) {
-            await fetchNutrition();
+            await fetchNutrition(items);
             setScreen("results");
         }
     };
@@ -287,9 +320,17 @@ export default function MenuMatch({ navigation }: any) {
                     totals={totals}
                     nutrientCircles={nutrientCircles}
                     nutrition={nutrition}
+                    result={result}
                 />
             )
             }
         </SafeAreaView>
     );
+}
+
+function formatPredictDate(value: Date) {
+    const month = String(value.getMonth() + 1).padStart(2, "0");
+    const day = String(value.getDate()).padStart(2, "0");
+    const year = value.getFullYear();
+    return `${year}-${month}-${day}`;
 }
