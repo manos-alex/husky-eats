@@ -82,42 +82,50 @@ export default function MenuMatch({ navigation, route }: any) {
     };
 
     const predict = async () => {
-        try {
-            if (!image || !hall || !meal) {
-                return [];
-            }
-            if (!PREDICT_API_URL) {
-                throw new Error("PREDICT_API_URL is not configured.");
-            }
+        const result: ItemMatch[] = [
+            {name: "Cross Trax French Fries", id: "161069", servings: 0.75},
+            {name: "Fried Chicken Nuggets", id: "111037", servings: 2},
+            {name: "Corn", id: "171012", servings: 1},
+        ]
 
-            const formData = new FormData();
-            formData.append("image", {
-                uri: image,
-                name: "plate.jpg",
-                type: "image/jpeg",
-            } as unknown as Blob);
-            formData.append("dining_hall_id", String(hall));
-            formData.append("meal", meal);
-            formData.append("date", formatPredictDate(date));
+        return result;
+        
+        // try {
+        //     if (!image || !hall || !meal) {
+        //         return [];
+        //     }
+        //     if (!PREDICT_API_URL) {
+        //         throw new Error("PREDICT_API_URL is not configured.");
+        //     }
 
-            const res = await fetch(PREDICT_API_URL, {
-                method: "POST",
-                body: formData,
-            });
+        //     const formData = new FormData();
+        //     formData.append("image", {
+        //         uri: image,
+        //         name: "plate.jpg",
+        //         type: "image/jpeg",
+        //     } as unknown as Blob);
+        //     formData.append("dining_hall_id", String(hall));
+        //     formData.append("meal", meal);
+        //     formData.append("date", formatPredictDate(date));
 
-            if (!res.ok) {
-                throw new Error(`Predict request failed with status ${res.status}`);
-            }
+        //     const res = await fetch(PREDICT_API_URL, {
+        //         method: "POST",
+        //         body: formData,
+        //     });
 
-            const data = await res.json();
-            const items = (Array.isArray(data) ? data : data.items ?? []) as ItemMatch[];
+        //     if (!res.ok) {
+        //         throw new Error(`Predict request failed with status ${res.status}`);
+        //     }
 
-            setResult(items);
-            return items;
-        } catch (err) {
-            console.error("Failed to predict items and servings.", err);
-            return [];
-        }
+        //     const data = await res.json();
+        //     const items = (Array.isArray(data) ? data : data.items ?? []) as ItemMatch[];
+
+        //     setResult(items);
+        //     return items;
+        // } catch (err) {
+        //     console.error("Failed to predict items and servings.", err);
+        //     return [];
+        // }
 
         // Previous path/query implementation kept for reference.
         // try {
