@@ -229,5 +229,61 @@ export function findMealtime(hall: DiningHall) {
         if (inInterval(hall.wddinner)[0]) return ["Dinner", `Until ${inInterval(hall.wddinner)[1]}`];
     }
 
-    return ["Closed", ""];
+    return ["Closed", findNextOpening(hall)];
+}
+
+function findNextOpening(hall: DiningHall) {
+    const now = new Date();
+
+    for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+        const date = new Date(now);
+        date.setDate(now.getDate() + dayOffset);
+        const schedules = getDaySchedules(hall, date.getDay());
+
+        for (const schedule of schedules) {
+            if (!schedule.time) {
+                continue;
+            }
+
+            const start = getDateForTime(date, schedule.time.split("-")[0]);
+            if (start > now) {
+                const time = start.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
+
+                if (dayOffset === 0) {
+                    return `Opens ${time}`;
+                }
+
+                if (dayOffset === 1) {
+                    return `Opens tomorrow ${time}`;
+                }
+
+                return `Opens ${start.toLocaleDateString([], { weekday: "long" })} ${time}`;
+            }
+        }
+    }
+
+    return "Closed today";
+}
+
+function getDaySchedules(hall: DiningHall, day: number) {
+    if (day === 0 || day === 6) {
+        return [
+            { meal: "Breakfast", time: day === 6 ? hall.wesatbreakfast : hall.wesunbreakfast },
+            { meal: "Brunch", time: hall.webrunch },
+            { meal: "Dinner", time: hall.wedinner },
+        ];
+    }
+
+    return [
+        { meal: "Breakfast", time: hall.wdbreakfast },
+        { meal: "Lunch", time: hall.wdlunch },
+        { meal: "Dinner", time: hall.wddinner },
+    ];
+}
+
+function getDateForTime(date: Date, time: string) {
+    const [hour, minute] = time.split(":").map(Number);
+    const result = new Date(date);
+    result.setHours(hour, minute, 0, 0);
+    return result;
 }
