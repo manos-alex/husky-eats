@@ -35,7 +35,7 @@ export default function Home({ navigation }: any) {
                 </Text>
             </View>
 
-            <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 124 }}>
+            <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 20 }}>
                 {loading ? (
                     <View className="rounded-[28px] border border-[#1E1E1E] bg-[#171717] px-5 py-6">
                         <Text className="font-lexend text-[22px] text-[#E2E2E2]">Loading halls...</Text>
