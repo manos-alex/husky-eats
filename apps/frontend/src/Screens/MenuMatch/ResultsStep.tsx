@@ -1,7 +1,6 @@
 import { ScrollView, Text, View } from "react-native";
 import { Circle } from "react-native-progress";
-import { NutritionFacts } from "../../api";
-import { result } from "./constants";
+import { ItemMatch, NutritionFacts } from "../../api";
 
 type Totals = {
   calories: number;
@@ -20,9 +19,10 @@ type ResultsStepProps = {
   totals: Totals;
   nutrientCircles: NutrientCircle[];
   nutrition: NutritionFacts[];
+  result: ItemMatch[];
 };
 
-export function ResultsStep({ totals, nutrientCircles, nutrition }: ResultsStepProps) {
+export function ResultsStep({ totals, nutrientCircles, nutrition, result }: ResultsStepProps) {
   const formatMacro = (value: number) => `${value.toFixed(1)}g`;
 
   return (

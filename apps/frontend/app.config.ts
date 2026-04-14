@@ -38,6 +38,7 @@ const config: ExpoConfig = {
     ],
     extra: {
         API_BASEURL: process.env.API_BASEURL,
+        PREDICT_API_URL: process.env.PREDICT_API_URL,
     }
 }
 
