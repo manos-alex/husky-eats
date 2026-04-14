@@ -82,24 +82,16 @@ export default function MenuMatch({ navigation, route }: any) {
     };
 
     const predict = async () => {
-        const result: ItemMatch[] = [
-            {name: "Cross Trax French Fries", id: "161069", servings: 0.75},
-            {name: "Fried Chicken Nuggets", id: "111037", servings: 2},
-            {name: "Corn", id: "171012", servings: 1},
-        ]
-
-        return result;
-        
         // try {
-        //     if (!image || !hall || !meal) {
-        //         return [];
-        //     }
-        //     if (!PREDICT_API_URL) {
-        //         throw new Error("PREDICT_API_URL is not configured.");
-        //     }
-
-        //     const formData = new FormData();
-        //     formData.append("image", {
+        //         if (!image || !hall || !meal) {
+        //                 return [];
+        //             }
+        //             if (!PREDICT_API_URL) {
+        //                     throw new Error("PREDICT_API_URL is not configured.");
+        //                 }
+                    
+        //                 const formData = new FormData();
+        //                 formData.append("image", {
         //         uri: image,
         //         name: "plate.jpg",
         //         type: "image/jpeg",
@@ -109,7 +101,7 @@ export default function MenuMatch({ navigation, route }: any) {
         //     formData.append("date", formatPredictDate(date));
 
         //     const res = await fetch(PREDICT_API_URL, {
-        //         method: "POST",
+        //             method: "POST",
         //         body: formData,
         //     });
 
@@ -123,36 +115,44 @@ export default function MenuMatch({ navigation, route }: any) {
         //     setResult(items);
         //     return items;
         // } catch (err) {
-        //     console.error("Failed to predict items and servings.", err);
-        //     return [];
+        //         console.error("Failed to predict items and servings.", err);
+        //         return [];
         // }
-
-        // Previous path/query implementation kept for reference.
+        
+// Previous path/query implementation kept for reference.
         // try {
-        //     if (image) {
-        //         const img = await fetch(image);
+            //     if (image) {
+                //         const img = await fetch(image);
         //         const blob = await img.blob();
-
+        
         //         const res = await fetch("https://busy-outreach-virtue-lauderdale.trycloudflare.com/predict?dining_hall_id=5&meal_time=lunch&meal_date=2025-11-25", {
-        //             method: "POST",
-        //             headers: {
+            //             method: "POST",
+            //             headers: {
         //                 "Content-Type": "image/png",
         //             },
         //             body: blob,
         //         });
-
+        
         //         const data = await res.json();
         //         console.log(data);
         //         setResult(data);
         //         setScreen("results");
         //     }
         // } catch (err) {
-        //     console.error("Failed to predict items and servings.", err);
-        // }
-
-    };
-
-    const fetchNutrition = async (items: ItemMatch[]) => {
+            //     console.error("Failed to predict items and servings.", err);
+            // }
+            
+// Hard coded implementation
+            const result: ItemMatch[] = [
+                {name: "Cross Trax French Fries", id: "161069", servings: 0.75},
+                {name: "Fried Chicken Nuggets", id: "111037", servings: 2},
+                {name: "Corn", id: "171012", servings: 1},
+            ]
+            setResult(result);
+            return result;
+        };
+        
+        const fetchNutrition = async (items: ItemMatch[]) => {
         try {
             const nf = await Promise.all(
                 items.map((item) => getNutritionFacts({ id: Number(item.id) }))

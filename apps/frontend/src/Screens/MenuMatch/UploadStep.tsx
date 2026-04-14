@@ -27,7 +27,7 @@ export function UploadStep({ onPickImage, onMenusPress, animateTabFrom, animateT
   }, [animateTabFrom, animateTabNonce, tabAnimation, tabBarWidth]);
 
   return (
-    <View className="flex-1 px-5 pt-3 pb-8">
+    <View className="flex-1 px-5 pt-3">
       <View className="rounded-[32px] border border-[#1A1A1A] bg-[#171D27] px-6 py-6">
         <Text className="font-gotham text-[44px] leading-[50px] text-[#E2E2E2]">
           MenuMatch
@@ -94,26 +94,28 @@ export function UploadStep({ onPickImage, onMenusPress, animateTabFrom, animateT
         </View>
       </View>
 
-      <View
-        className="relative flex-row rounded-[24px] border border-[#1C1C1C] bg-[#161616] p-2"
-        onLayout={(event) => setTabBarWidth(event.nativeEvent.layout.width)}
-      >
-        <Animated.View
-          className="absolute bottom-2 left-2 top-2 rounded-[18px] bg-[#1A2740]"
-          style={{
-            width: tabBarWidth ? (tabBarWidth - 16) / 2 : 0,
-            transform: [
-              {
-                translateX: tabAnimation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: tabBarWidth ? [0, (tabBarWidth - 16) / 2] : [0, 0],
-                }),
-              },
-            ],
-          }}
-        />
+      <View className="-mx-5 border-t border-[#1B1B1B] bg-[#111111] px-5 pb-6 pt-4">
+        <View
+          className="relative flex-row rounded-[24px] border border-[#1C1C1C] bg-[#161616] p-2"
+          onLayout={(event) => setTabBarWidth(event.nativeEvent.layout.width)}
+        >
+          <Animated.View
+            className="absolute bottom-2 left-2 top-2 rounded-[18px] bg-[#1A2740]"
+            style={{
+              width: tabBarWidth ? (tabBarWidth - 16) / 2 : 0,
+              transform: [
+                {
+                  translateX: tabAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: tabBarWidth ? [0, (tabBarWidth - 16) / 2] : [0, 0],
+                  }),
+                },
+              ],
+            }}
+          />
           <BottomNavButton label="Menus" onPress={onMenusPress} />
           <BottomNavButton active label="MenuMatch" onPress={() => {}} />
+        </View>
       </View>
     </View>
   );

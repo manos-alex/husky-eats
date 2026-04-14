@@ -67,12 +67,13 @@ export default function Home({ navigation, route }: any) {
                     halls.map((hall) => {
                         const [mealLabel, mealStatus] = findMealtime(hall);
                         const mealColor = getMealAccent(mealLabel);
+                        const hallMeal = mealLabel === "Closed" ? findNextMeal(hall) : mealLabel;
 
                         return (
                         <Pressable
                             className="mb-4 rounded-[30px] border border-[#1A1A1A] bg-[#151515] px-5 py-5"
                             key={hall.id}
-                            onPress={() => navigation.navigate("Hall", { hall, meal: mealLabel })}
+                            onPress={() => navigation.navigate("Hall", { hall, meal: hallMeal })}
                         >
                             <View
                                 className="absolute left-0 top-6 bottom-6 w-[4px] rounded-full"
@@ -197,7 +198,7 @@ function getMealAccent(mealLabel: string) {
 }
 
 export function stringToDate(time: string) {
-    const [hour, minute] = time.split(":").map(Number);
+    const [hour, minute = 0] = time.split(":").map(Number);
     const date = new Date();
     date.setHours(hour, minute, 0, 0);
     return date;
@@ -233,6 +234,37 @@ export function findMealtime(hall: DiningHall) {
 }
 
 function findNextOpening(hall: DiningHall) {
+    const nextOpening = getNextOpening(hall);
+
+    if (!nextOpening) {
+        return "Closed today";
+    }
+
+    const { dayOffset, start } = nextOpening;
+    const time = start.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
+
+    if (dayOffset === 0) {
+        return `Opens ${time}`;
+    }
+
+    if (dayOffset === 1) {
+        return `Opens tomorrow ${time}`;
+    }
+
+    return `Opens ${start.toLocaleDateString([], { weekday: "long" })} ${time}`;
+}
+
+function findNextMeal(hall: DiningHall) {
+    const nextOpening = getNextOpening(hall);
+
+    if (!nextOpening) {
+        return "Breakfast";
+    }
+
+    return normalizeMealForHall(nextOpening.meal);
+}
+
+function getNextOpening(hall: DiningHall) {
     const now = new Date();
 
     for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
@@ -247,22 +279,16 @@ function findNextOpening(hall: DiningHall) {
 
             const start = getDateForTime(date, schedule.time.split("-")[0]);
             if (start > now) {
-                const time = start.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
-
-                if (dayOffset === 0) {
-                    return `Opens ${time}`;
-                }
-
-                if (dayOffset === 1) {
-                    return `Opens tomorrow ${time}`;
-                }
-
-                return `Opens ${start.toLocaleDateString([], { weekday: "long" })} ${time}`;
+                return {
+                    dayOffset,
+                    meal: schedule.meal,
+                    start,
+                };
             }
         }
     }
 
-    return "Closed today";
+    return null;
 }
 
 function getDaySchedules(hall: DiningHall, day: number) {
@@ -282,8 +308,16 @@ function getDaySchedules(hall: DiningHall, day: number) {
 }
 
 function getDateForTime(date: Date, time: string) {
-    const [hour, minute] = time.split(":").map(Number);
+    const [hour, minute = 0] = time.split(":").map(Number);
     const result = new Date(date);
     result.setHours(hour, minute, 0, 0);
     return result;
+}
+
+function normalizeMealForHall(meal: string) {
+    if (meal === "Brunch") {
+        return "Lunch";
+    }
+
+    return meal;
 }
