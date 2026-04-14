@@ -236,7 +236,10 @@ export default function MenuMatch({ navigation, route }: any) {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-[#232323]" edges={["top", "left", "right"]}>
+        <SafeAreaView
+            className="flex-1 bg-[#232323]"
+            edges={screen === "camera" ? ["left", "right"] : ["top", "left", "right"]}
+        >
             {screen === "upload" ? (
                 null
             ) : screen === "camera" ? null : (
