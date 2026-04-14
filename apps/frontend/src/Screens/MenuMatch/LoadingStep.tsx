@@ -94,10 +94,6 @@ export function LoadingStep() {
 
   return (
     <View className="flex-1 px-6 pt-10 pb-10 items-center justify-center">
-      <View className="absolute -top-10 -right-8 h-56 w-56 rounded-full bg-[#2F82F82B]" />
-      <View className="absolute top-44 -left-16 h-72 w-72 rounded-full bg-[#34D3991A]" />
-      <View className="absolute bottom-8 -right-16 h-80 w-80 rounded-full bg-[#A78BFA1A]" />
-
       <Animated.View
         className="items-center justify-center"
         style={{
@@ -106,32 +102,32 @@ export function LoadingStep() {
       >
         <View className="h-[310px] w-[310px] items-center justify-center">
           <Animated.View
-            className="absolute h-[290px] w-[290px] rounded-full border border-[#8CAAD844]"
+            className="absolute h-[290px] w-[290px] rounded-full border border-[#202B3C]"
             style={{ transform: [{ rotate: rotateA }] }}
           />
           <Animated.View
-            className="absolute h-[240px] w-[240px] rounded-full border border-[#65A5FF77]"
+            className="absolute h-[240px] w-[240px] rounded-full border border-[#263B5F]"
             style={{ transform: [{ rotate: rotateB }] }}
           />
           <Animated.View
-            className="absolute h-[175px] w-[175px] rounded-full border border-[#B8D3FF60] bg-[#2A4D7A1F]"
+            className="absolute h-[175px] w-[175px] rounded-full border border-[#263B5F] bg-[#1A274040]"
             style={{ transform: [{ scale: coreScale }], opacity: coreOpacity }}
           />
-          <View className="h-[120px] w-[120px] rounded-full border border-[#CFE2FF7A] bg-[#2F82F8] items-center justify-center">
-            <Text className="font-gotham text-[14px] tracking-[1px] text-[#EAF3FF]">ANALYZING</Text>
+          <View className="h-[120px] w-[120px] rounded-full border border-[#263B5F] bg-[#1A2740] items-center justify-center">
+            <Text className="font-gotham text-[14px] tracking-[1px] text-[#9CC0FA]">ANALYZING</Text>
           </View>
         </View>
       </Animated.View>
 
-      <View className="mt-3 w-full max-w-[360px] rounded-[22px] border border-[#5E7FB550] bg-[#151C28E0] px-5 py-5">
-        <Text className="font-lexend text-[29px] leading-[34px] text-[#EFF5FF]">Building your meal estimate</Text>
-        <Text className="mt-3 font-lexend font-light text-[17px] leading-[25px] text-[#A8B9D6]">
+      <View className="mt-3 w-full max-w-[360px] rounded-[30px] border border-[#1A1A1A] bg-[#151515] px-5 py-5">
+        <Text className="font-lexend text-[29px] leading-[34px] text-[#E2E2E2]">Building your meal estimate</Text>
+        <Text className="mt-3 font-lexend font-light text-[17px] leading-[25px] text-[#A8A8A8]">
           Matching your plate with dining hall menu items and calculating calories, carbs, protein, and fat.
         </Text>
-        <Text className="mt-4 font-gotham text-[13px] tracking-[1px] text-[#8FB3EA]">{`Working${".".repeat(dotCount)}`}</Text>
+        <Text className="mt-4 font-gotham text-[13px] tracking-[1px] text-[#86A6CF]">{`Working${".".repeat(dotCount)}`}</Text>
       </View>
 
-      <Text className="mt-5 font-lexend text-[14px] text-[#8DA5C9]">Usually takes a few seconds</Text>
+      <Text className="mt-5 font-lexend text-[14px] text-[#8C8C8C]">Usually takes a few seconds</Text>
     </View>
   );
 }
