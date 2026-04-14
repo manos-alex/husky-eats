@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react';
-import { Text, View, ScrollView, Pressable } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, Easing, Text, View, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { getDiningHalls, DiningHall } from '../api';
 import "../../global.css";
 
-export default function Home({ navigation }: any) {
+export default function Home({ navigation, route }: any) {
     const [halls, setHalls] = useState<DiningHall[]>([]);
     const [loading, setLoading] = useState(true);
+    const [tabBarWidth, setTabBarWidth] = useState(0);
+    const tabAnimation = useRef(new Animated.Value(route?.params?.animateTabFrom === "MenuMatch" ? 1 : 0)).current;
 
     useEffect(() => {
         async function load() {
@@ -24,6 +26,24 @@ export default function Home({ navigation }: any) {
 
         load();
     }, []);
+
+    useEffect(() => {
+        if (route?.params?.animateTabFrom !== "MenuMatch" || !tabBarWidth) {
+            return;
+        }
+
+        tabAnimation.setValue(1);
+        Animated.timing(tabAnimation, {
+            toValue: 0,
+            duration: 220,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+        }).start();
+    }, [route?.params?.animateTabFrom, route?.params?.animateTabNonce, tabAnimation, tabBarWidth]);
+
+    const navigateToMenuMatch = () => {
+        navigation.navigate("MenuMatch", { animateTabFrom: "Menus", animateTabNonce: Date.now() });
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-[#232323]" edges={["top", "left", "right"]}>
@@ -89,9 +109,26 @@ export default function Home({ navigation }: any) {
             </ScrollView>
 
             <View className="border-t border-[#1B1B1B] bg-[#111111] px-5 pb-6 pt-4">
-                <View className="flex-row rounded-[24px] border border-[#1C1C1C] bg-[#161616] p-2">
-                    <BottomNavButton active label="Menus" onPress={() => navigation.navigate("Home")} />
-                    <BottomNavButton label="MenuMatch" onPress={() => navigation.navigate("MenuMatch")} />
+                <View
+                    className="relative flex-row rounded-[24px] border border-[#1C1C1C] bg-[#161616] p-2"
+                    onLayout={(event) => setTabBarWidth(event.nativeEvent.layout.width)}
+                >
+                    <Animated.View
+                        className="absolute bottom-2 left-2 top-2 rounded-[18px] bg-[#1A2740]"
+                        style={{
+                            width: tabBarWidth ? (tabBarWidth - 16) / 2 : 0,
+                            transform: [
+                                {
+                                    translateX: tabAnimation.interpolate({
+                                        inputRange: [0, 1],
+                                        outputRange: tabBarWidth ? [0, (tabBarWidth - 16) / 2] : [0, 0],
+                                    }),
+                                },
+                            ],
+                        }}
+                    />
+                    <BottomNavButton active label="Menus" onPress={() => {}} />
+                    <BottomNavButton label="MenuMatch" onPress={navigateToMenuMatch} />
                 </View>
             </View>
         </SafeAreaView>
@@ -109,7 +146,7 @@ function BottomNavButton({
 }) {
     return (
         <Pressable
-            className={`flex-1 rounded-[18px] px-4 py-3 ${active ? "bg-[#1A2740]" : "bg-transparent"}`}
+            className="z-10 flex-1 rounded-[18px] px-4 py-3"
             onPress={onPress}
         >
             <Text className={`font-lexend text-center text-[16px] ${active ? "text-[#9CC0FA]" : "text-[#8C8C8C]"}`}>

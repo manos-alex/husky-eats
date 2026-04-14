@@ -1,40 +1,141 @@
-import { Pressable, Text, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Animated, Easing, Pressable, Text, View } from "react-native";
 
 type UploadStepProps = {
   onPickImage: () => Promise<void>;
+  onMenusPress: () => void;
+  animateTabFrom?: "Menus" | "MenuMatch";
+  animateTabNonce?: number;
 };
 
-export function UploadStep({ onPickImage }: UploadStepProps) {
+export function UploadStep({ onPickImage, onMenusPress, animateTabFrom, animateTabNonce }: UploadStepProps) {
+  const [tabBarWidth, setTabBarWidth] = useState(0);
+  const tabAnimation = useRef(new Animated.Value(animateTabFrom === "Menus" ? 0 : 1)).current;
+
+  useEffect(() => {
+    if (animateTabFrom !== "Menus" || !tabBarWidth) {
+      return;
+    }
+
+    tabAnimation.setValue(0);
+    Animated.timing(tabAnimation, {
+      toValue: 1,
+      duration: 220,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [animateTabFrom, animateTabNonce, tabAnimation, tabBarWidth]);
+
   return (
-    <View className="flex-1 px-6 pt-8 pb-10">
-      <View className="absolute -top-12 -right-10 h-44 w-44 rounded-full bg-[#3F83F820]" />
-      <View className="absolute top-40 -left-16 h-64 w-64 rounded-full bg-[#34D3991A]" />
-      <View className="absolute bottom-12 -right-20 h-80 w-80 rounded-full bg-[#A78BFA14]" />
-
-      <View className="mt-8 rounded-[24px] border border-[#5E7FB550] bg-[#161D29D8] px-6 py-7">
-        <Text className="font-gotham text-[14px] tracking-[3px] text-[#8FB3EA]">SMART NUTRITION</Text>
-        <Text className="mt-4 font-lexend text-[42px] leading-[48px] text-[#F5F8FF]">
-          Show me your plate.
+    <View className="flex-1 px-5 pt-3 pb-8">
+      <View className="rounded-[32px] border border-[#1A1A1A] bg-[#171D27] px-6 py-6">
+        <Text className="font-gotham text-[44px] leading-[50px] text-[#E2E2E2]">
+          MenuMatch
         </Text>
-        <Text className="mt-1 font-lexend text-[42px] leading-[48px] text-[#DCE8FF]">Get your breakdown.</Text>
-        <Text className="mt-6 font-lexend font-light text-[18px] leading-[28px] text-[#9DAFCB]">
-          To begin, show me your plate and I will guide you through a fast, accurate estimate of calories and macros.
+        <Text className="mt-3 font-lexend font-light text-[18px] leading-[28px] text-[#AFC8E8]">
+          Take a photo of your plate and get an estimated calorie and macro breakdown.
         </Text>
       </View>
 
-      <View className="mt-6 rounded-[20px] border border-[#FFFFFF1A] bg-[#10151F] px-5 py-4">
-        <Text className="font-gotham text-[14px] tracking-[1px] text-[#9CB2D7]">BEST RESULTS</Text>
-        <Text className="mt-2 font-lexend text-[16px] text-[#D6E2F9]">Use bright lighting and show the full plate.</Text>
+      <View className="mt-5 overflow-hidden rounded-[32px] border border-[#1A1A1A] bg-[#151515]">
+        <View className="px-6 py-5">
+          <View className="flex-row items-center">
+            <View className="mr-4 h-12 w-12 items-center justify-center rounded-full bg-[#1A2740]">
+              <Text className="font-lexend text-[22px] text-[#9CC0FA]">1</Text>
+            </View>
+            <View className="flex-1">
+              <Text className="font-lexend text-[20px] text-[#E2E2E2]">Snap your meal</Text>
+              <Text className="mt-1 font-lexend font-light text-[15px] text-[#A8A8A8]">
+                Bright lighting and the full plate help most.
+              </Text>
+            </View>
+          </View>
+
+          <View className="my-4 ml-6 h-8 w-px bg-[#2A2A2A]" />
+
+          <View className="flex-row items-center">
+            <View className="mr-4 h-12 w-12 items-center justify-center rounded-full bg-[#162019]">
+              <Text className="font-lexend text-[22px] text-[#A8D3AE]">2</Text>
+            </View>
+            <View className="flex-1">
+              <Text className="font-lexend text-[20px] text-[#E2E2E2]">Confirm the context</Text>
+              <Text className="mt-1 font-lexend font-light text-[15px] text-[#A8A8A8]">
+                Choose the dining hall, meal time, and date.
+              </Text>
+            </View>
+          </View>
+
+          <View className="my-4 ml-6 h-8 w-px bg-[#2A2A2A]" />
+
+          <View className="flex-row items-center">
+            <View className="mr-4 h-12 w-12 items-center justify-center rounded-full bg-[#2A2115]">
+              <Text className="font-lexend text-[22px] text-[#E8C27A]">3</Text>
+            </View>
+            <View className="flex-1">
+              <Text className="font-lexend text-[20px] text-[#E2E2E2]">Review the estimate</Text>
+              <Text className="mt-1 font-lexend font-light text-[15px] text-[#A8A8A8]">
+                See matched items, servings, calories, and macros.
+              </Text>
+            </View>
+          </View>
+        </View>
       </View>
 
-      <View className="mt-auto w-[82%] max-w-[360px] self-center rounded-[20px] border border-[#89B7FF44] bg-[#1A2D4D96] p-2">
-        <Pressable
-          className="h-16 rounded-[14px] border border-[#BFD8FF70] bg-[#2F82F8] justify-center"
-          onPress={onPickImage}
-        >
-          <Text className="font-lexend font-semibold text-[24px] text-[#ECF4FF] text-center">Take Photo</Text>
-        </Pressable>
+      <View className="flex-1 justify-center">
+        <View className="rounded-[24px] border border-[#263B5F] bg-[#111111] p-2">
+          <Pressable
+            className="h-16 justify-center rounded-[18px] bg-[#1A2740]"
+            onPress={onPickImage}
+          >
+            <Text className="text-center font-lexend text-[23px] text-[#9CC0FA]">
+              Take Photo
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+
+      <View
+        className="relative flex-row rounded-[24px] border border-[#1C1C1C] bg-[#161616] p-2"
+        onLayout={(event) => setTabBarWidth(event.nativeEvent.layout.width)}
+      >
+        <Animated.View
+          className="absolute bottom-2 left-2 top-2 rounded-[18px] bg-[#1A2740]"
+          style={{
+            width: tabBarWidth ? (tabBarWidth - 16) / 2 : 0,
+            transform: [
+              {
+                translateX: tabAnimation.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: tabBarWidth ? [0, (tabBarWidth - 16) / 2] : [0, 0],
+                }),
+              },
+            ],
+          }}
+        />
+          <BottomNavButton label="Menus" onPress={onMenusPress} />
+          <BottomNavButton active label="MenuMatch" onPress={() => {}} />
       </View>
     </View>
+  );
+}
+
+function BottomNavButton({
+  active = false,
+  label,
+  onPress,
+}: {
+  active?: boolean;
+  label: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      className="z-10 flex-1 rounded-[18px] px-4 py-3"
+      onPress={onPress}
+    >
+      <Text className={`text-center font-lexend text-[16px] ${active ? "text-[#9CC0FA]" : "text-[#8C8C8C]"}`}>
+        {label}
+      </Text>
+    </Pressable>
   );
 }

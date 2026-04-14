@@ -17,7 +17,7 @@ type MenuMatchScreen = "upload" | "camera" | "details" | "review" | "loading" | 
 
 const PREDICT_API_URL = Constants.expoConfig?.extra?.PREDICT_API_URL as string | undefined;
 
-export default function MenuMatch({ navigation }: any) {
+export default function MenuMatch({ navigation, route }: any) {
     const [screen, setScreen] = useState<MenuMatchScreen>("upload");
 
     const [hall, setHall] = useState<number | null>(null);
@@ -236,18 +236,15 @@ export default function MenuMatch({ navigation }: any) {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-[#252525]" edges={["top", "left", "right"]}>
+        <SafeAreaView className="flex-1 bg-[#232323]" edges={["top", "left", "right"]}>
             {screen === "upload" ? (
-                <>
-                    <Text className="mt-8 font-gotham text-[#DDD] text-[40px] text-center">Welcome to</Text>
-                    <Text className="font-lexend text-[#DDD] text-[48px] text-center">MenuMatch</Text>
-                </>
+                null
             ) : screen === "camera" ? null : (
-                <View className="px-3 pt-2 pb-1">
+                <View className="px-5 pt-3 pb-3">
                     <View className="relative h-16 justify-center">
                         <View className="absolute inset-0 items-center justify-center pointer-events-none">
                             <Text
-                                className={`font-lexend text-[#DDD] text-[40px] leading-[40px] text-center`}
+                                className="font-gotham text-[#E2E2E2] text-[34px] leading-[40px] text-center"
                                 numberOfLines={1}
                             >
                                 {screenTitle[screen]}
@@ -257,11 +254,11 @@ export default function MenuMatch({ navigation }: any) {
                         <View className="absolute left-0 top-0 bottom-0 z-20 justify-center">
                             {showBack ? (
                                 <Pressable
-                                    className="h-16 w-12 items-center justify-center"
+                                    className="rounded-full border border-[#202020] bg-[#171717] px-4 py-3"
                                     onPress={handleBack}
                                     hitSlop={12}
                                 >
-                                    <Text className="text-[40px] leading-[40px] text-[#8AB4FF]">‹</Text>
+                                    <Text className="font-lexend text-[18px] leading-[18px] text-[#D8D8D8]">Back</Text>
                                 </Pressable>
                             ) : null}
                         </View>
@@ -269,24 +266,29 @@ export default function MenuMatch({ navigation }: any) {
                         <View className="absolute right-0 top-0 bottom-0 z-30 justify-center" style={{ elevation: 8 }}>
                             {screen === "results" ? (
                                 <Pressable
-                                    className="items-center justify-center rounded-[12px] border border-[#9CC0FA55] bg-[#102036F2] px-3 py-2"
+                                    className="items-center justify-center rounded-full border border-[#263B5F] bg-[#1A2740] px-4 py-3"
                                     onPress={handleSaveExit}
                                     hitSlop={14}
                                 >
-                                    <Text className="font-lexend text-[14px] text-[#E4EEFF]">Save / Exit</Text>
+                                    <Text className="font-lexend text-[14px] text-[#9CC0FA]">Save / Exit</Text>
                                 </Pressable>
                             ) : null}
                         </View>
                     </View>
                     {screen === "details" && (
-                        <Text className="mt-2 font-lexend font-light text-[#9BA6BA] text-[17px] text-center">
+                        <Text className="mt-2 font-lexend font-light text-[#A8A8A8] text-[17px] text-center">
                             Tell me where and when this meal was served.
                         </Text>
                     )}
                 </View>
             )}
             {screen === "upload" ? (
-                <UploadStep onPickImage={pickImage} />
+                <UploadStep
+                    onPickImage={pickImage}
+                    onMenusPress={() => navigation.navigate("Home", { animateTabFrom: "MenuMatch", animateTabNonce: Date.now() })}
+                    animateTabFrom={route?.params?.animateTabFrom}
+                    animateTabNonce={route?.params?.animateTabNonce}
+                />
             ) : screen === "camera" ? (
                 <CameraCaptureStep
                     cameraRef={cameraRef}

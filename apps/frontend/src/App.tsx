@@ -23,10 +23,10 @@ export default function App() {
         <SafeAreaProvider>
             <NavigationContainer>
                 <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Home">
-                    <Stack.Screen name="Home" component={Home}/>
+                    <Stack.Screen name="Home" component={Home} options={{ animation: "none" }}/>
                     <Stack.Screen name="Hall" component={Hall}/>
                     <Stack.Screen name="Nutrition" component={Nutrition}/>
-                    <Stack.Screen name="MenuMatch" component={MenuMatch}/>
+                    <Stack.Screen name="MenuMatch" component={MenuMatch} options={{ animation: "none" }}/>
                 </Stack.Navigator>
             </NavigationContainer>
         </SafeAreaProvider>
