@@ -93,10 +93,10 @@ export function ResultsStep({ totals, nutrientCircles, nutrition, result }: Resu
               const nf = nutrition.find((n) => n.id === Number(item.id));
               if (!nf) return null;
 
-              const calories = (nf.calories ?? 0) * item.servings;
-              const protein = (nf.protein_g ?? 0) * item.servings;
-              const carbs = (nf.totalcarbohydrate_g ?? 0) * item.servings;
-              const fat = (nf.totalfat_g ?? 0) * item.servings;
+              const calories = (nf.calories ?? 0) * item.num_servings;
+              const protein = (nf.protein_g ?? 0) * item.num_servings;
+              const carbs = (nf.totalcarbohydrate_g ?? 0) * item.num_servings;
+              const fat = (nf.totalfat_g ?? 0) * item.num_servings;
               const accent = getItemAccent(index);
 
               return (
@@ -121,7 +121,7 @@ export function ResultsStep({ totals, nutrientCircles, nutrition, result }: Resu
                       </View>
                       <View className="ml-2 w-[96px] rounded-[16px] border border-[#252525] bg-[#151515] px-3 py-2">
                         <Text className="font-gotham text-[11px] tracking-[0.7px] text-[#8C8C8C]">SERVINGS</Text>
-                        <Text className="mt-1 font-lexend text-[15px] text-[#D8D8D8]">{item.servings.toFixed(2)}</Text>
+                        <Text className="mt-1 font-lexend text-[15px] text-[#D8D8D8]">{item.num_servings.toFixed(2)}</Text>
                       </View>
                     </View>
 

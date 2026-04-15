@@ -82,76 +82,52 @@ export default function MenuMatch({ navigation, route }: any) {
     };
 
     const predict = async () => {
-        // try {
-        //         if (!image || !hall || !meal) {
-        //                 return [];
-        //             }
-        //             if (!PREDICT_API_URL) {
-        //                     throw new Error("PREDICT_API_URL is not configured.");
-        //                 }
-                    
-        //                 const formData = new FormData();
-        //                 formData.append("image", {
-        //         uri: image,
-        //         name: "plate.jpg",
-        //         type: "image/jpeg",
-        //     } as unknown as Blob);
-        //     formData.append("dining_hall_id", String(hall));
-        //     formData.append("meal", meal);
-        //     formData.append("date", formatPredictDate(date));
+        try {
+            if (!image || !hall || !meal) {
+                return [];
+            }
+            if (!PREDICT_API_URL) {
+                throw new Error("PREDICT_API_URL is not configured.");
+            }
 
-        //     const res = await fetch(PREDICT_API_URL, {
-        //             method: "POST",
-        //         body: formData,
-        //     });
+            const formData = new FormData();
+            formData.append("image", {
+                uri: image,
+                name: "plate.jpg",
+                type: "image/jpeg",
+            } as unknown as Blob);
+            formData.append("dining_hall_id", String(hall));
+            formData.append("meal", meal);
+            formData.append("date", formatPredictDate(date));
 
-        //     if (!res.ok) {
-        //         throw new Error(`Predict request failed with status ${res.status}`);
-        //     }
+            const res = await fetch(PREDICT_API_URL, {
+                    method: "POST",
+                body: formData,
+            });
 
-        //     const data = await res.json();
-        //     const items = (Array.isArray(data) ? data : data.items ?? []) as ItemMatch[];
+            if (!res.ok) {
+                throw new Error(`Predict request failed with status ${res.status}`);
+            }
 
-        //     setResult(items);
-        //     return items;
-        // } catch (err) {
-        //         console.error("Failed to predict items and servings.", err);
-        //         return [];
-        // }
-        
-// Previous path/query implementation kept for reference.
-        // try {
-            //     if (image) {
-                //         const img = await fetch(image);
-        //         const blob = await img.blob();
-        
-        //         const res = await fetch("https://busy-outreach-virtue-lauderdale.trycloudflare.com/predict?dining_hall_id=5&meal_time=lunch&meal_date=2025-11-25", {
-            //             method: "POST",
-            //             headers: {
-        //                 "Content-Type": "image/png",
-        //             },
-        //             body: blob,
-        //         });
-        
-        //         const data = await res.json();
-        //         console.log(data);
-        //         setResult(data);
-        //         setScreen("results");
-        //     }
-        // } catch (err) {
-            //     console.error("Failed to predict items and servings.", err);
-            // }
-            
+            const data = await res.json();
+            const items = (Array.isArray(data) ? data : data.servings ?? []) as ItemMatch[];
+
+            setResult(items);
+            return items;
+        } catch (err) {
+                console.error("Failed to predict items and servings.", err);
+                return [];
+        }
+
 // Hard coded implementation
-            const result: ItemMatch[] = [
-                {name: "Cross Trax French Fries", id: "161069", servings: 0.75},
-                {name: "Fried Chicken Nuggets", id: "111037", servings: 2},
-                {name: "Corn", id: "171012", servings: 1},
-            ]
-            setResult(result);
-            return result;
+            // const result: ItemMatch[] = [
+            //     {name: "Char Siu Chicken", id: "302202", num_servings: 1},
+            //     {name: "Edamame Fried Rice", id: "300914", num_servings: 0.84},
+            // ]
+            // setResult(result);
+            // return result;
         };
-        
+
         const fetchNutrition = async (items: ItemMatch[]) => {
         try {
             const nf = await Promise.all(
@@ -173,8 +149,8 @@ export default function MenuMatch({ navigation, route }: any) {
         const items = await predict();
         if (items.length) {
             await fetchNutrition(items);
-            setScreen("results");
         }
+        setScreen("results");
     };
 
     const totals = useMemo(() => {
@@ -183,7 +159,7 @@ export default function MenuMatch({ navigation, route }: any) {
                 const facts = nutrition.find((n) => n.id === Number(item.id));
                 if (!facts) return acc;
 
-                const servings = item.servings ?? 0;
+                const servings = item.num_servings ?? 0;
                 acc.calories += (facts.calories ?? 0) * servings;
                 acc.carbs += (facts.totalcarbohydrate_g ?? 0) * servings;
                 acc.protein += (facts.protein_g ?? 0) * servings;

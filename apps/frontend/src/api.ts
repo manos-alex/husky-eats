@@ -56,7 +56,7 @@ export interface NutritionFacts {
 export interface ItemMatch {
     id: string,
     name: string,
-    servings: number,
+    num_servings: number,
 }
 
 const baseURL: string = 
