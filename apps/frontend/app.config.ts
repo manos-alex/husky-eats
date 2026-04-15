@@ -15,7 +15,8 @@ const config: ExpoConfig = {
         backgroundColor: "#ffffff"
     },
     ios: {
-        supportsTablet: true
+        supportsTablet: true,
+        bundleIdentifier: "com.alexman.huskyeats",
     },
     android: {
         adaptiveIcon: {
@@ -39,6 +40,9 @@ const config: ExpoConfig = {
     extra: {
         API_BASEURL: process.env.API_BASEURL,
         PREDICT_API_URL: process.env.PREDICT_API_URL,
+        eas: {
+            projectId: "6afe1512-c4a8-4f3c-8f42-1c9e291016a3",
+        }
     }
 }
 
