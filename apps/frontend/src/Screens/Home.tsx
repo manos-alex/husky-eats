@@ -67,7 +67,7 @@ export default function Home({ navigation, route }: any) {
                     halls.map((hall) => {
                         const [mealLabel, mealStatus] = findMealtime(hall);
                         const mealColor = getMealAccent(mealLabel);
-                        const hallMeal = mealLabel === "Closed" ? findNextMeal(hall) : mealLabel;
+                        const hallMeal = mealLabel === "Closed" ? findNextMeal(hall) : normalizeMealForHall(mealLabel);
 
                         return (
                         <Pressable
@@ -190,6 +190,14 @@ function getMealAccent(mealLabel: string) {
         };
     }
 
+    if (mealLabel === "Late Night") {
+        return {
+            bg: "#162326",
+            text: "#8FD5DF",
+            bar: "#4C9FAB",
+        };
+    }
+
     return {
         bg: "#202020",
         text: "#B8B8B8",
@@ -224,10 +232,12 @@ export function findMealtime(hall: DiningHall) {
         if (day === 0) if (inInterval(hall.wesunbreakfast)[0]) return ["Breakfast", `Until ${inInterval(hall.wesunbreakfast)[1]}`];
         if (inInterval(hall.webrunch)[0]) return ["Brunch", `Until ${inInterval(hall.webrunch)[1]}`];
         if (inInterval(hall.wedinner)[0]) return ["Dinner", `Until ${inInterval(hall.wedinner)[1]}`];
+        if (hasLateNightForDay(hall, day) && inInterval(hall.latenight)[0]) return ["Late Night", `Until ${inInterval(hall.latenight)[1]}`];
     } else {
         if (inInterval(hall.wdbreakfast)[0]) return ["Breakfast", `Until ${inInterval(hall.wdbreakfast)[1]}`];
         if (inInterval(hall.wdlunch)[0]) return ["Lunch", `Until ${inInterval(hall.wdlunch)[1]}`];
         if (inInterval(hall.wddinner)[0]) return ["Dinner", `Until ${inInterval(hall.wddinner)[1]}`];
+        if (hasLateNightForDay(hall, day) && inInterval(hall.latenight)[0]) return ["Late Night", `Until ${inInterval(hall.latenight)[1]}`];
     }
 
     return ["Closed", findNextOpening(hall)];
@@ -297,6 +307,7 @@ function getDaySchedules(hall: DiningHall, day: number) {
             { meal: "Breakfast", time: day === 6 ? hall.wesatbreakfast : hall.wesunbreakfast },
             { meal: "Brunch", time: hall.webrunch },
             { meal: "Dinner", time: hall.wedinner },
+            ...(hasLateNightForDay(hall, day) ? [{ meal: "Late Night", time: hall.latenight }] : []),
         ];
     }
 
@@ -304,7 +315,12 @@ function getDaySchedules(hall: DiningHall, day: number) {
         { meal: "Breakfast", time: hall.wdbreakfast },
         { meal: "Lunch", time: hall.wdlunch },
         { meal: "Dinner", time: hall.wddinner },
+        ...(hasLateNightForDay(hall, day) ? [{ meal: "Late Night", time: hall.latenight }] : []),
     ];
+}
+
+function hasLateNightForDay(hall: DiningHall, day: number) {
+    return hall.haslatenight && day >= 0 && day <= 4;
 }
 
 function getDateForTime(date: Date, time: string) {
@@ -317,6 +333,10 @@ function getDateForTime(date: Date, time: string) {
 function normalizeMealForHall(meal: string) {
     if (meal === "Brunch") {
         return "Lunch";
+    }
+
+    if (meal === "Late Night") {
+        return "Dinner";
     }
 
     return meal;
