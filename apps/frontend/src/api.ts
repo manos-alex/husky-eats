@@ -77,10 +77,10 @@ export async function getDiningHalls({ id } : {id?: number}) {
     return res.json();
 }
 
-export async function getMenuItems({ meal, hallid, date } : {meal?: string, hallid?: number, date?: Date}) {
+export async function getMenuItems({ meal, hallid, date } : {meal?: string, hallid?: number, date?: Date | string}) {
     const params = new URLSearchParams();
     if (meal) params.append("meal", meal);
-    if (date) params.append("date", date.toISOString().split("T")[0]);
+    if (date) params.append("date", typeof date === "string" ? date : date.toISOString().split("T")[0]);
     if (hallid) params.append("hallid", hallid.toString());
 
     const res = await fetch(`${baseURL}/menu?${params.toString()}`);

@@ -12,7 +12,8 @@ type RootStackParamList = {
 };
 
 export default function Hall({route}: any) {
-    const { hall, meal } = route.params;
+    const { hall, meal, date } = route.params;
+    const menuDate = typeof date === "string" ? date : getDateKey(new Date());
 
     const [breakfastItems, setBreakfastItems] = useState<MenuItem[]>([]);
     const [lunchItems, setLunchItems] = useState<MenuItem[]>([]);
@@ -33,14 +34,14 @@ export default function Hall({route}: any) {
         async function load() {
             try {
                 setLoading(true);
-                const d = new Date();
-                const breakfastItemsRes = await getMenuItems({hallid: hall.id, date: d, meal: "Breakfast"});
-                const lunchItemsRes = await getMenuItems({hallid: hall.id, date: d, meal: "Lunch"});
-                const dinnerItemsRes = await getMenuItems({hallid: hall.id, date: d, meal: "Dinner"});
+                const breakfastItemsRes = await getMenuItems({hallid: hall.id, date: menuDate, meal: "Breakfast"});
+                const lunchItemsRes = await getMenuItems({hallid: hall.id, date: menuDate, meal: "Lunch"});
+                const dinnerItemsRes = await getMenuItems({hallid: hall.id, date: menuDate, meal: "Dinner"});
 
                 setBreakfastItems(breakfastItemsRes);
                 setLunchItems(lunchItemsRes);
                 setDinnerItems(dinnerItemsRes);
+                setNutritionById({});
             } catch (err) {
                 console.log(err);
             } finally {
@@ -49,7 +50,7 @@ export default function Hall({route}: any) {
         }
 
         load();
-    }, [hall.id])
+    }, [hall.id, menuDate])
 
     useEffect(() => {
         if (curMeal === "Breakfast") {
@@ -196,6 +197,9 @@ export default function Hall({route}: any) {
                     </Text>
                     <View className="w-[74px]" />
                 </View>
+                <Text className="mt-2 text-center font-lexend text-[13px] text-[#9E9E9E]">
+                    {formatMenuDate(menuDate)}
+                </Text>
 
                 <View className="mt-5 rounded-[24px] border border-[#1C1C1C] bg-[#161616] p-2">
                     <View
@@ -233,7 +237,7 @@ export default function Hall({route}: any) {
                     <View className="rounded-[28px] border border-[#1E1E1E] bg-[#171717] px-5 py-6">
                         <Text className="font-lexend text-[22px] text-[#E2E2E2]">Loading menu...</Text>
                         <Text className="mt-2 font-lexend font-light text-[15px] text-[#A8A8A8]">
-                            Pulling today's items for {hall.name}.
+                            Pulling items for {formatMenuDate(menuDate)}.
                         </Text>
                     </View>
                 ) : groupedItems.length ? (
@@ -329,6 +333,25 @@ function getMealIndex(meal: string) {
     if (meal === "Lunch") return 1;
     if (meal === "Dinner") return 2;
     return 0;
+}
+
+function getDateKey(date: Date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
+function formatMenuDate(dateKey: string) {
+    const [year, month, day] = dateKey.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
+    const today = new Date();
+
+    if (getDateKey(date) === getDateKey(today)) {
+        return "Today";
+    }
+
+    return date.toLocaleDateString([], { weekday: "long", month: "short", day: "numeric" });
 }
 
 function formatAllergens(allergens?: string) {

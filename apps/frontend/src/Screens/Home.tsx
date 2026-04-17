@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Text, View, ScrollView, Pressable } from 'react-native';
+import { Animated, Easing, Text, View, ScrollView, Pressable, Platform } from 'react-native';
+import DateTimePicker, { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { getDiningHalls, DiningHall } from '../api';
@@ -9,7 +10,15 @@ export default function Home({ navigation, route }: any) {
     const [halls, setHalls] = useState<DiningHall[]>([]);
     const [loading, setLoading] = useState(true);
     const [tabBarWidth, setTabBarWidth] = useState(0);
+    const [selectedDate, setSelectedDate] = useState(() => startOfDay(new Date()));
+    const [showDatePicker, setShowDatePicker] = useState(false);
     const tabAnimation = useRef(new Animated.Value(route?.params?.animateTabFrom === "MenuMatch" ? 1 : 0)).current;
+    const today = startOfDay(new Date());
+    const minDate = addDays(today, -14);
+    const maxDate = addDays(today, 14);
+    const selectedDateKey = getDateKey(selectedDate);
+    const canGoPrevious = selectedDate > minDate;
+    const canGoNext = selectedDate < maxDate;
 
     useEffect(() => {
         async function load() {
@@ -45,6 +54,33 @@ export default function Home({ navigation, route }: any) {
         navigation.navigate("MenuMatch", { animateTabFrom: "Menus", animateTabNonce: Date.now() });
     };
 
+    const handleDateChange = (_event: DateTimePickerEvent, date?: Date) => {
+        setShowDatePicker(false);
+
+        if (date) {
+            setSelectedDate(clampDate(date, minDate, maxDate));
+        }
+    };
+
+    const openDatePicker = () => {
+        if (Platform.OS === "android") {
+            DateTimePickerAndroid.open({
+                value: selectedDate,
+                mode: "date",
+                minimumDate: minDate,
+                maximumDate: maxDate,
+                onChange: handleDateChange,
+            });
+            return;
+        }
+
+        setShowDatePicker((current) => !current);
+    };
+
+    const changeDateByDays = (days: number) => {
+        setSelectedDate((current) => clampDate(addDays(current, days), minDate, maxDate));
+    };
+
     return (
         <SafeAreaView className="flex-1 bg-[#232323]" edges={["top", "left", "right"]}>
             <StatusBar style="light" />
@@ -55,7 +91,7 @@ export default function Home({ navigation, route }: any) {
                 </Text>
             </View>
 
-            <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 20 }}>
+            <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 14, paddingBottom: 20 }}>
                 {loading ? (
                     <View className="rounded-[28px] border border-[#1E1E1E] bg-[#171717] px-5 py-6">
                         <Text className="font-lexend text-[22px] text-[#E2E2E2]">Loading halls...</Text>
@@ -65,15 +101,15 @@ export default function Home({ navigation, route }: any) {
                     </View>
                 ) : halls.length ? (
                     halls.map((hall) => {
-                        const [mealLabel, mealStatus] = findMealtime(hall);
+                        const [mealLabel, mealStatus] = findMealtime(hall, selectedDate);
                         const mealColor = getMealAccent(mealLabel);
-                        const hallMeal = mealLabel === "Closed" ? findNextMeal(hall) : normalizeMealForHall(mealLabel);
+                        const hallMeal = mealLabel === "Closed" ? findNextMeal(hall, selectedDate) : normalizeMealForHall(mealLabel);
 
                         return (
                         <Pressable
                             className="mb-4 rounded-[30px] border border-[#1A1A1A] bg-[#151515] px-5 py-5"
                             key={hall.id}
-                            onPress={() => navigation.navigate("Hall", { hall, meal: hallMeal })}
+                            onPress={() => navigation.navigate("Hall", { hall, meal: hallMeal, date: selectedDateKey })}
                         >
                             <View
                                 className="absolute left-0 top-6 bottom-6 w-[4px] rounded-full"
@@ -110,6 +146,33 @@ export default function Home({ navigation, route }: any) {
             </ScrollView>
 
             <View className="border-t border-[#1B1B1B] bg-[#111111] px-5 pb-6 pt-4">
+                <View className="mb-3 w-full flex-row items-center rounded-lg border border-[#1A1A1A] bg-[#151515] p-1">
+                    <DateStepButton disabled={!canGoPrevious} label="<" onPress={() => changeDateByDays(-1)} />
+                    <Pressable
+                        className="mx-1 flex-1 rounded-lg bg-[#202020] px-4 py-1.5"
+                        onPress={openDatePicker}
+                    >
+                        <Text className="font-lexend text-center text-[15px] text-[#E2E2E2]">
+                            {formatDateLabel(selectedDate, today)}
+                        </Text>
+                        <Text className="mt-0.5 font-lexend text-center text-[11px] text-[#8F8F8F]">
+                            {formatShortDate(selectedDate)}
+                        </Text>
+                    </Pressable>
+                    <DateStepButton disabled={!canGoNext} label=">" onPress={() => changeDateByDays(1)} />
+                </View>
+
+                {showDatePicker && Platform.OS !== "android" && (
+                    <DateTimePicker
+                        display="inline"
+                        mode="date"
+                        value={selectedDate}
+                        minimumDate={minDate}
+                        maximumDate={maxDate}
+                        onChange={handleDateChange}
+                    />
+                )}
+
                 <View
                     className="relative flex-row rounded-[24px] border border-[#1C1C1C] bg-[#161616] p-2"
                     onLayout={(event) => setTabBarWidth(event.nativeEvent.layout.width)}
@@ -151,6 +214,28 @@ function BottomNavButton({
             onPress={onPress}
         >
             <Text className={`font-lexend text-center text-[16px] ${active ? "text-[#9CC0FA]" : "text-[#8C8C8C]"}`}>
+                {label}
+            </Text>
+        </Pressable>
+    );
+}
+
+function DateStepButton({
+    disabled,
+    label,
+    onPress,
+}: {
+    disabled: boolean;
+    label: string;
+    onPress: () => void;
+}) {
+    return (
+        <Pressable
+            className={`h-9 w-11 items-center justify-center rounded-lg bg-[#202020] ${disabled ? "opacity-35" : "opacity-100"}`}
+            disabled={disabled}
+            onPress={onPress}
+        >
+            <Text className="font-lexend text-[20px] text-[#D6D6D6]">
                 {label}
             </Text>
         </Pressable>
@@ -205,46 +290,56 @@ function getMealAccent(mealLabel: string) {
     };
 }
 
-export function stringToDate(time: string) {
+export function stringToDate(time: string, date = new Date()) {
     const [hour, minute = 0] = time.split(":").map(Number);
-    const date = new Date();
-    date.setHours(hour, minute, 0, 0);
-    return date;
+    const result = new Date(date);
+    result.setHours(hour, minute, 0, 0);
+    return result;
 }
 
-export function inInterval(time: string | null) {
+export function inInterval(time: string | null, referenceDate = new Date()) {
     if (time === null) return [false, ""];
 
     const interval = time.split("-");
-    const start = stringToDate(interval[0]);
-    const end = stringToDate(interval[1]);
+    const start = stringToDate(interval[0], referenceDate);
+    const end = stringToDate(interval[1], referenceDate);
     const now = new Date();
 
     if (start <= now && now <= end) return [true, end.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true })];
     return [false, ""];
 }
 
-export function findMealtime(hall: DiningHall) {
-    const day = new Date().getDay()
+export function findMealtime(hall: DiningHall, date = new Date()) {
+    const day = date.getDay();
 
-    if (day === 0 || day === 6) {
-        if (day === 6) if (inInterval(hall.wesatbreakfast)[0]) return ["Breakfast", `Until ${inInterval(hall.wesatbreakfast)[1]}`];
-        if (day === 0) if (inInterval(hall.wesunbreakfast)[0]) return ["Breakfast", `Until ${inInterval(hall.wesunbreakfast)[1]}`];
-        if (inInterval(hall.webrunch)[0]) return ["Brunch", `Until ${inInterval(hall.webrunch)[1]}`];
-        if (inInterval(hall.wedinner)[0]) return ["Dinner", `Until ${inInterval(hall.wedinner)[1]}`];
-        if (hasLateNightForDay(hall, day) && inInterval(hall.latenight)[0]) return ["Late Night", `Until ${inInterval(hall.latenight)[1]}`];
-    } else {
-        if (inInterval(hall.wdbreakfast)[0]) return ["Breakfast", `Until ${inInterval(hall.wdbreakfast)[1]}`];
-        if (inInterval(hall.wdlunch)[0]) return ["Lunch", `Until ${inInterval(hall.wdlunch)[1]}`];
-        if (inInterval(hall.wddinner)[0]) return ["Dinner", `Until ${inInterval(hall.wddinner)[1]}`];
-        if (hasLateNightForDay(hall, day) && inInterval(hall.latenight)[0]) return ["Late Night", `Until ${inInterval(hall.latenight)[1]}`];
+    if (!isSameDay(date, new Date())) {
+        const firstSchedule = getDaySchedules(hall, day).find((schedule) => schedule.time);
+
+        if (!firstSchedule?.time) {
+            return ["Closed", "No meals listed"];
+        }
+
+        return [firstSchedule.meal, formatInterval(firstSchedule.time, date)];
     }
 
-    return ["Closed", findNextOpening(hall)];
+    if (day === 0 || day === 6) {
+        if (day === 6) if (inInterval(hall.wesatbreakfast, date)[0]) return ["Breakfast", `Until ${inInterval(hall.wesatbreakfast, date)[1]}`];
+        if (day === 0) if (inInterval(hall.wesunbreakfast, date)[0]) return ["Breakfast", `Until ${inInterval(hall.wesunbreakfast, date)[1]}`];
+        if (inInterval(hall.webrunch, date)[0]) return ["Brunch", `Until ${inInterval(hall.webrunch, date)[1]}`];
+        if (inInterval(hall.wedinner, date)[0]) return ["Dinner", `Until ${inInterval(hall.wedinner, date)[1]}`];
+        if (hasLateNightForDay(hall, day) && inInterval(hall.latenight, date)[0]) return ["Late Night", `Until ${inInterval(hall.latenight, date)[1]}`];
+    } else {
+        if (inInterval(hall.wdbreakfast, date)[0]) return ["Breakfast", `Until ${inInterval(hall.wdbreakfast, date)[1]}`];
+        if (inInterval(hall.wdlunch, date)[0]) return ["Lunch", `Until ${inInterval(hall.wdlunch, date)[1]}`];
+        if (inInterval(hall.wddinner, date)[0]) return ["Dinner", `Until ${inInterval(hall.wddinner, date)[1]}`];
+        if (hasLateNightForDay(hall, day) && inInterval(hall.latenight, date)[0]) return ["Late Night", `Until ${inInterval(hall.latenight, date)[1]}`];
+    }
+
+    return ["Closed", findNextOpening(hall, date)];
 }
 
-function findNextOpening(hall: DiningHall) {
-    const nextOpening = getNextOpening(hall);
+function findNextOpening(hall: DiningHall, date = new Date()) {
+    const nextOpening = getNextOpening(hall, date);
 
     if (!nextOpening) {
         return "Closed today";
@@ -264,8 +359,14 @@ function findNextOpening(hall: DiningHall) {
     return `Opens ${start.toLocaleDateString([], { weekday: "long" })} ${time}`;
 }
 
-function findNextMeal(hall: DiningHall) {
-    const nextOpening = getNextOpening(hall);
+function findNextMeal(hall: DiningHall, date = new Date()) {
+    const selectedDaySchedule = getDaySchedules(hall, date.getDay()).find((schedule) => schedule.time);
+
+    if (selectedDaySchedule) {
+        return normalizeMealForHall(selectedDaySchedule.meal);
+    }
+
+    const nextOpening = getNextOpening(hall, date);
 
     if (!nextOpening) {
         return "Breakfast";
@@ -274,21 +375,22 @@ function findNextMeal(hall: DiningHall) {
     return normalizeMealForHall(nextOpening.meal);
 }
 
-function getNextOpening(hall: DiningHall) {
+function getNextOpening(hall: DiningHall, date = new Date()) {
     const now = new Date();
+    const searchDate = isSameDay(date, now) ? now : startOfDay(date);
 
     for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
-        const date = new Date(now);
-        date.setDate(now.getDate() + dayOffset);
-        const schedules = getDaySchedules(hall, date.getDay());
+        const currentDate = new Date(searchDate);
+        currentDate.setDate(searchDate.getDate() + dayOffset);
+        const schedules = getDaySchedules(hall, currentDate.getDay());
 
         for (const schedule of schedules) {
             if (!schedule.time) {
                 continue;
             }
 
-            const start = getDateForTime(date, schedule.time.split("-")[0]);
-            if (start > now) {
+            const start = getDateForTime(currentDate, schedule.time.split("-")[0]);
+            if (start > searchDate) {
                 return {
                     dayOffset,
                     meal: schedule.meal,
@@ -328,6 +430,72 @@ function getDateForTime(date: Date, time: string) {
     const result = new Date(date);
     result.setHours(hour, minute, 0, 0);
     return result;
+}
+
+function formatInterval(time: string, date: Date) {
+    const [start, end] = time.split("-");
+    return `${formatTime(start, date)} - ${formatTime(end, date)}`;
+}
+
+function formatTime(time: string, date: Date) {
+    return getDateForTime(date, time).toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
+}
+
+function startOfDay(date: Date) {
+    const result = new Date(date);
+    result.setHours(0, 0, 0, 0);
+    return result;
+}
+
+function addDays(date: Date, days: number) {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return startOfDay(result);
+}
+
+function clampDate(date: Date, minDate: Date, maxDate: Date) {
+    const result = startOfDay(date);
+
+    if (result < minDate) {
+        return minDate;
+    }
+
+    if (result > maxDate) {
+        return maxDate;
+    }
+
+    return result;
+}
+
+function isSameDay(first: Date, second: Date) {
+    return getDateKey(first) === getDateKey(second);
+}
+
+function getDateKey(date: Date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
+function formatDateLabel(date: Date, today: Date) {
+    if (isSameDay(date, today)) {
+        return "Today";
+    }
+
+    if (isSameDay(date, addDays(today, -1))) {
+        return "Yesterday";
+    }
+
+    if (isSameDay(date, addDays(today, 1))) {
+        return "Tomorrow";
+    }
+
+    return date.toLocaleDateString([], { weekday: "long" });
+}
+
+function formatShortDate(date: Date) {
+    return date.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
 function normalizeMealForHall(meal: string) {
