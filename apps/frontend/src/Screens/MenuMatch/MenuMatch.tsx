@@ -208,12 +208,12 @@ export default function MenuMatch({ navigation, route }: any) {
                     text: "Save",
                     onPress: () => {
                         // Save flow placeholder: implement persistence here later.
-                        navigation.navigate("Home");
+                        navigation.replace("Home");
                     },
                 },
                 {
                     text: "Don't Save",
-                    onPress: () => navigation.navigate("Home"),
+                    onPress: () => navigation.replace("Home"),
                 },
             ]
         );
@@ -272,7 +272,7 @@ export default function MenuMatch({ navigation, route }: any) {
             {screen === "upload" ? (
                 <UploadStep
                     onPickImage={pickImage}
-                    onMenusPress={() => navigation.navigate("Home", { animateTabFrom: "MenuMatch", animateTabNonce: Date.now() })}
+                    onMenusPress={() => navigation.replace("Home", { animateTabFrom: "MenuMatch", animateTabNonce: Date.now() })}
                     animateTabFrom={route?.params?.animateTabFrom}
                     animateTabNonce={route?.params?.animateTabNonce}
                 />

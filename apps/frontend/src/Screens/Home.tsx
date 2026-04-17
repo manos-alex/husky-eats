@@ -51,7 +51,7 @@ export default function Home({ navigation, route }: any) {
     }, [route?.params?.animateTabFrom, route?.params?.animateTabNonce, tabAnimation, tabBarWidth]);
 
     const navigateToMenuMatch = () => {
-        navigation.navigate("MenuMatch", { animateTabFrom: "Menus", animateTabNonce: Date.now() });
+        navigation.replace("MenuMatch", { animateTabFrom: "Menus", animateTabNonce: Date.now() });
     };
 
     const handleDateChange = (_event: DateTimePickerEvent, date?: Date) => {

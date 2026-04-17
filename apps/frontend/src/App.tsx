@@ -1,6 +1,7 @@
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { NavigationContainer } from "@react-navigation/native";
+import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { View } from "react-native";
 import Home from "./Screens/Home";
 import Hall from "./Screens/Hall";
 import Nutrition from "./Screens/Nutrition";
@@ -10,6 +11,15 @@ import "../global.css";
 
 
 const Stack = createNativeStackNavigator();
+const APP_BACKGROUND = "#232323";
+const navigationTheme = {
+    ...DefaultTheme,
+    colors: {
+        ...DefaultTheme.colors,
+        background: APP_BACKGROUND,
+        card: APP_BACKGROUND,
+    },
+};
 
 export default function App() {
     // Load font
@@ -20,15 +30,17 @@ export default function App() {
     });
 
     return (
-        <SafeAreaProvider>
-            <NavigationContainer>
-                <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Home">
-                    <Stack.Screen name="Home" component={Home} options={{ animation: "none" }}/>
-                    <Stack.Screen name="Hall" component={Hall}/>
-                    <Stack.Screen name="Nutrition" component={Nutrition}/>
-                    <Stack.Screen name="MenuMatch" component={MenuMatch} options={{ animation: "none" }}/>
-                </Stack.Navigator>
-            </NavigationContainer>
-        </SafeAreaProvider>
+        <View style={{ flex: 1, backgroundColor: APP_BACKGROUND }}>
+            <SafeAreaProvider style={{ backgroundColor: APP_BACKGROUND }}>
+                <NavigationContainer theme={navigationTheme}>
+                    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: APP_BACKGROUND } }} initialRouteName="Home">
+                        <Stack.Screen name="Home" component={Home} options={{ animation: "none", gestureEnabled: false }}/>
+                        <Stack.Screen name="Hall" component={Hall}/>
+                        <Stack.Screen name="Nutrition" component={Nutrition}/>
+                        <Stack.Screen name="MenuMatch" component={MenuMatch} options={{ animation: "none", gestureEnabled: false }}/>
+                    </Stack.Navigator>
+                </NavigationContainer>
+            </SafeAreaProvider>
+        </View>
     );
 }

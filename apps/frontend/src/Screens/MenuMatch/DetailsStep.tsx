@@ -123,8 +123,10 @@ export function DetailsStep({
               value={date}
               mode="date"
               display="compact"
-              onChange={(ev) => {
-                onDateChange(new Date(ev.nativeEvent.timestamp));
+              onChange={(_event, selectedDate) => {
+                if (selectedDate) {
+                  onDateChange(selectedDate);
+                }
               }}
             />
           </View>
